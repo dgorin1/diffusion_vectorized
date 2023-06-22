@@ -20,27 +20,29 @@ from optimization_routines import diffEV_multiples
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_KM95-28-Dc-1250um.csv")
-domains_to_model = 3
-mineral_name = "quartz"
-time_add = [300*60,110073600]
-temp_add = [40,21.111111111111]
-sample_name = "KM95-28-Dc-1250um"
+data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles.csv")
+domains_to_model = 6
+mineral_name = "kspar"
+time_add = [0,0]
+temp_add = [0,0]
+sample_name = "n13ksp_moles"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
-misfit_stat = "l2_moles"
-omit_value_indices = []#[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72]
-
+misfit_stat = "l2_frac"
+omit_value_indices =  [32,33,34,35,36,37,38,39,40,41]
 
 
 
 #################################################################
 
 def organize_x(x,ndim):
-        ndom = int(((ndim-1)/2))
-        moles = x[0]
-        Ea = x[1]
-        lnd0aa = x[2:2+ndom]
-        fracs = x[2+ndom:]
+        ndom = int(((ndim)/2))
+        print(f"ndom is {ndom}")
+        if len(x)%2 != 0:
+            moles = x[0]
+            x = x[1:]
+        Ea = x[0]
+        lnd0aa = x[1:1+ndom]
+        fracs = x[1+ndom:]
         fracs = np.append(fracs,1-np.sum(fracs))
         
         n = len(fracs)
@@ -78,8 +80,9 @@ objective = DiffusionObjective(
 # Read in the nonlinear constraint
 
 
-params, misfit_val = diffEV_multiples(objective,dataset,5,mineral_name,domains_to_model)
+params, misfit_val = diffEV_multiples(objective,dataset,10,mineral_name,domains_to_model)
 start_time = time.time()
 
 
 plot_results(params,dataset,objective,sample_name=sample_name)
+print(organize_x(params,len(params)))

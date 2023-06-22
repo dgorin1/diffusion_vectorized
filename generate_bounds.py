@@ -28,7 +28,7 @@ def generate_bounds(ndom:int, moles_bound, mineral_name:str,stat = "chisq"):
         else:
             moles = False
 
-        Ea_bounds = (100,400)
+        Ea_bounds = (100,500)
         lnd0aa_bounds = (-50,50)
         frac_bounds = (0,1)
 

@@ -19,8 +19,7 @@ def D0calc_MonteCarloErrors(expdata):
 
     #Check if units are in minutes and convert from hours to minutes if necesssary
 
-    if thr[1]>4:
-        thr = thr/60
+
 
     #Convert units
     TK = 273.15+TC

@@ -142,7 +142,7 @@ class DiffusionObjective():
                         moles_MDD = trueFracMDD * total_moles
 
                     # Scale by chosen number of moles
-                    moles_MDD = trueFracMDD * total_moles
+
 
 
                     if self.stat.lower() == "chisq":
@@ -150,7 +150,7 @@ class DiffusionObjective():
                     elif self.stat.lower() == "l1_moles":
                         misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(exp_moles-moles_MDD)))
                     elif self.stat.lower() == "l2_moles":
-                        misfit = torch.sum((1-self.omitValueIndices)*(exp_moles-moles_MDD)**2)
+                        misfit = torch.sum((1-self.omitValueIndices)*((exp_moles-moles_MDD)**2))
                     elif self.stat.lower() == "l1_frac":
                         misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD)))
                     elif self.stat.lower() == "l2_frac":
@@ -182,7 +182,7 @@ class DiffusionObjective():
                     elif self.stat.lower() == "l1_moles":
                         misfit = misfit = torch.sum(multiplier*(torch.abs(exp_moles.unsqueeze(1)-moles_MDD)),axis=0)
                     elif self.stat.lower() == "l2_moles":
-                        misfit = torch.sum((multiplier*(exp_moles.unsqueeze(1)-moles_MDD)**2),axis=0)
+                        misfit = torch.sum((multiplier*((exp_moles.unsqueeze(1)-moles_MDD)**2)),axis=0)
                     elif self.stat.lower() == "l1_frac":
                         misfit = torch.sum(multiplier*(torch.abs(trueFracFi-trueFracMDD)),axis=0)
                     elif self.stat.lower() == "l2_frac":
@@ -209,7 +209,7 @@ class DiffusionObjective():
             elif self.stat.lower() == "l1_moles":
                 misfit = torch.sum((1-self.omitValueIndices)*torch.abs(exp_moles-moles_MDD))
             elif self.stat.lower() == "l2_moles":
-                misfit = torch.sum((1-self.omitValueIndices)*(exp_moles-moles_MDD)**2)
+                misfit = torch.sum((1-self.omitValueIndices)*((exp_moles-moles_MDD)**2))
             elif self.stat.lower() == "l1_frac":
                 misfit = torch.sum((1-self.omitValueIndices)*torch.abs(trueFracFi-trueFracMDD))
             elif self.stat.lower() == "l2_frac":
