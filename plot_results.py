@@ -30,8 +30,6 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
         ndom = (len(params))//2
 
    
-
-
     # Reconstruct the time-added and temp-added inputs
     time = torch.tensor(dataset.thr*3600)
     TC = torch.tensor(dataset.TC)
