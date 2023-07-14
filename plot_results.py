@@ -6,7 +6,7 @@ from jax import numpy as jnp
 import pandas as pd
 from get_plot_name import get_plot_name
 
-def plot_results(params,dataset,objective, reference_law = [],sample_name:str = "",moves_type:str = ""):
+def plot_results(params,dataset,objective, reference_law = [],sample_name:str = "",moves_type:str = "",misfit_stat:str = ""):
     # Params is a vector X of the input parameters
     # dataset is the dataset class with your data
     # objective is the objective you used
@@ -30,8 +30,6 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
         ndom = (len(params))//2
 
    
-
-
     # Reconstruct the time-added and temp-added inputs
     time = torch.tensor(dataset.thr*3600)
     TC = torch.tensor(dataset.TC)
@@ -116,8 +114,8 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
         axes[0,1].set_ylabel("log(r/r_0)")
         axes[0,1].set_box_aspect(1)     
     plt.tight_layout
+    file_name = get_plot_name(ndom,"fit_plot",sample_name,moves_type = moves_type,misfit_stat = misfit_stat)
 
-    file_name = get_plot_name(ndom,"fit_plot",sample_name,moves_type = moves_type,)
     plt.savefig(file_name)
 
     plt.show()

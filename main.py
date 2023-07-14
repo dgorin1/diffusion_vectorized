@@ -1,6 +1,6 @@
 
 from diffusion_objective import DiffusionObjective
-from diffusion_problem import DiffusionProblem
+
 from jax import numpy as jnp
 from dataset import Dataset
 from plot_results import plot_results
@@ -19,7 +19,7 @@ import random
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_KM95-28-Dc-1250um.csv")
-domains_to_model = 3
+domains_to_model = 6
 mineral_name = "quartz"
 time_add = [300*60,110073600]
 temp_add = [40,21.111111111111]

@@ -1,6 +1,5 @@
 
 from diffusion_objective import DiffusionObjective
-from diffusion_problem import DiffusionProblem
 from jax import numpy as jnp
 from dataset import Dataset
 import torch as torch
@@ -17,6 +16,7 @@ import random
 import time
 from plot_results import plot_results
 from optimization_routines import diffEV_multiples
+from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -57,7 +57,10 @@ def organize_x(x,ndim):
                 if lnd0aa[j] < lnd0aa[j + 1]:
                     lnd0aa[j], lnd0aa[j + 1] = lnd0aa[j + 1], lnd0aa[j]
                     fracs[j], fracs[j + 1] = fracs[j + 1], fracs[j]
-        output = np.append(moles,Ea)
+        if len(x)%2 != 0:
+            output = np.append(moles,Ea)
+        else:
+             output = Ea
         output = np.append(output,lnd0aa)
         output = np.append(output,fracs[0:-1])
         return output
@@ -80,9 +83,10 @@ objective = DiffusionObjective(
 # Read in the nonlinear constraint
 
 
-params, misfit_val = diffEV_multiples(objective,dataset,10,mineral_name,domains_to_model)
+params, misfit_val = diffEV_multiples(objective,dataset,1,mineral_name,domains_to_model)
 start_time = time.time()
 
 
 plot_results(params,dataset,objective,sample_name=sample_name )
 print(organize_x(params,len(params)))
+
