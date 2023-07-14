@@ -30,6 +30,6 @@ def generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile):
 #generate some results
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-nameOfInputCSVFile =  f"{dir_path}/data/n13ksp_moles.csv"
-nameOfExperimentalResultsFile = f"{dir_path}/data/input_n13ksp_moles.csv"
+nameOfInputCSVFile =  f"{dir_path}/data/KM95-28b-Da-965um.csv"
+nameOfExperimentalResultsFile = f"{dir_path}/data/input_KM95-28b-Da-965um.csv"
 generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile)

@@ -19,7 +19,7 @@ def save_results(num_domains:int, sample_name:str = "",misfit_stat:str = "",para
     # Generate the file name
 
 
-    name = os.path.join(folder_name, f"{num_domains}domains_{current_date}_{misfit_stat}.txt")
+    name = os.path.join(folder_name, f"{num_domains}domains_{current_date}_{misfit_stat}.csv")
     with open(name, 'w',newline = '') as file:
         writer = csv.writer(file)
         writer.writerow(params)

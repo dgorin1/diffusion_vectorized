@@ -6,7 +6,7 @@ from jax import numpy as jnp
 import pandas as pd
 from get_plot_name import get_plot_name
 
-def plot_results(params,dataset,objective, reference_law = [],sample_name:str = "",moves_type:str = "",misfit_stat:str = ""):
+def plot_results(params,dataset,objective, reference_law = [],sample_name:str = "",moves_type:str = "",misfit_stat:str = "",quiet = False):
     # Params is a vector X of the input parameters
     # dataset is the dataset class with your data
     # objective is the objective you used
@@ -57,15 +57,20 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
     errors_for_plot = np.array(pd.concat([dataset["ln(D/a^2)"]-dataset["ln(D/a^2)-del"],dataset["ln(D/a^2)+del"]-dataset["ln(D/a^2)"]],axis=1).T)        
 
     #plt.subplot(n_plots,1,1)
+
     frac_weights = (fracs-torch.min(fracs)/(torch.max(fracs)-torch.min(fracs)))*1.5+1.3
+    if torch.any(torch.lt(frac_weights,0)):
+
+        frac_weights = torch.abs(frac_weights.flip(0))
+
     for i in range(ndom):
         D = np.log(np.exp(params[i+1])*np.exp((-params[0])/(R*(dataset["TC"]+273.15))))
         axes[0,0].plot(np.linspace(min(T_plot),max(T_plot),1000), np.linspace(max(D),min(D),1000), '--k',linewidth = frac_weights[i],zorder=0)
-   
-    axes[0,0].errorbar(T_plot,dataset["ln(D/a^2)"],yerr= errors_for_plot,fmt = 'bo',markersize=10,zorder=5)
-    axes[0,0].plot(T_plot,data[1],'ko',markersize=7,zorder = 10)
     
+    axes[0,0].errorbar(T_plot,dataset["ln(D/a^2)"].replace(-np.inf,0),yerr= errors_for_plot,fmt = 'bo',markersize=10,zorder=5)
     
+    axes[0,0].plot(T_plot,pd.Series(data[1].tolist()).replace(-np.inf,np.inf).fillna(max(data[1]).item()),'ko',markersize=7,zorder = 10)
+
     #Normalize Fractions for plotting weights
    
     if n_plots == 4:
@@ -118,4 +123,5 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
 
     plt.savefig(file_name)
 
-    plt.show()
+    if quiet == False:
+        plt.show()

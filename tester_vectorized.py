@@ -21,18 +21,18 @@ from save_results import save_results
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_KM95-28-Dc-1250um.csv")
-domains_to_model = 3
+domains_to_model = 6
 mineral_name = "quartz"
 time_add = [3600*5,110073600]
 temp_add = [40,21.111111111]
 sample_name = "KM95-28-Dc"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
-misfit_stat = "l1_moles"
+
 omit_value_indices =  []
 
+misfit_stat_list = ["chisq","l1_moles","l2_moles","l1_frac","l2_frac","l1_moles","l2_moles","l1_frac","l2_frac","percent_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
-#################################################################
 
 def organize_x(x,ndim):
         ndom = int(((ndim)/2))
@@ -66,28 +66,34 @@ def organize_x(x,ndim):
         return output
 
 # Create dataset class for each associate package
+#################################################################
 
-dataset = Dataset("diffEV", data_input)
-
-
-objective = DiffusionObjective(
-    "diffEV",
-    dataset, 
-    time_add = torch.tensor(time_add), 
-    temp_add = torch.tensor(temp_add), 
-    pickle_path = f"{dir_path}/data/lookup_table.pkl",
-    omitValueIndices= omit_value_indices,
-    stat = misfit_stat
-)
-
-# Read in the nonlinear constraint
+for i in range(2,11):
+    domains_to_model = i
+    print(i)
+    for misfit_stat in misfit_stat_list:
+        print(misfit_stat)
+        dataset = Dataset("diffEV", data_input)
 
 
-params, misfit_val = diffEV_multiples(objective,dataset,1,mineral_name,domains_to_model)
-start_time = time.time()
+        objective = DiffusionObjective(
+            "diffEV",
+            dataset, 
+            time_add = torch.tensor(time_add), 
+            temp_add = torch.tensor(temp_add), 
+            pickle_path = f"{dir_path}/data/lookup_table.pkl",
+            omitValueIndices= omit_value_indices,
+            stat = misfit_stat
+        )
+
+        # Read in the nonlinear constraint
 
 
-plot_results(params,dataset,objective,sample_name=sample_name )
-save_results(domains_to_model,sample_name = sample_name,misfit_stat = misfit_stat)
-print(organize_x(params,len(params)))
+        params, misfit_val = diffEV_multiples(objective,dataset,10,mineral_name,domains_to_model)
+        start_time = time.time()
+
+
+        plot_results(params,dataset,objective,sample_name=sample_name,quiet = True)
+        save_results(domains_to_model,sample_name = sample_name,misfit_stat = misfit_stat,params = params)
+        print(organize_x(params,len(params)))
 
