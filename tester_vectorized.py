@@ -21,7 +21,7 @@ from save_results import save_results
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_KM95-28-Dc-1250um.csv")
-domains_to_model = 6
+domains_to_model = 3
 mineral_name = "quartz"
 time_add = [3600*5,110073600]
 temp_add = [40,21.111111111]
@@ -88,5 +88,6 @@ start_time = time.time()
 
 
 plot_results(params,dataset,objective,sample_name=sample_name )
+save_results(domains_to_model,sample_name = sample_name,misfit_stat = misfit_stat)
 print(organize_x(params,len(params)))
 
