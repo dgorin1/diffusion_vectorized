@@ -21,13 +21,13 @@ from save_results import save_results
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_KM95-28-Dc-1250um.csv")
-domains_to_model = 3
+domains_to_model = 6
 mineral_name = "quartz"
 time_add = [3600*5,110073600]
 temp_add = [40,21.111111111]
 sample_name = "KM95-28-Dc"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
-misfit_stat = "l2_frac"
+misfit_stat = "l1_moles"
 omit_value_indices =  []
 
 
@@ -87,7 +87,6 @@ params, misfit_val = diffEV_multiples(objective,dataset,1,mineral_name,domains_t
 start_time = time.time()
 
 
-plot_results(params, dataset, objective, sample_name=sample_name, misfit_stat = misfit_stat)
-save_results(domains_to_model, sample_name = sample_name,misfit_stat = misfit_stat, params = params)
+plot_results(params,dataset,objective,sample_name=sample_name )
 print(organize_x(params,len(params)))
 
