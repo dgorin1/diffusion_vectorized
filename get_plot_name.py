@@ -8,7 +8,6 @@ def get_plot_name(num_domains:int,plot_type, sample_name:str = "",extra_label:st
     # Get the current date and time
     current_date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
     run_name = f"{num_domains}domains_{misfit_stat}_{moves_type}_{current_date}"
-
     # Create the folder if it doesn't exist
     if file_type == "h5":
         folder_name = os.path.join("MCMC_data",sample_name)

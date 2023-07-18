@@ -20,26 +20,29 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_KM95-28-Dc-1250um.csv")
-domains_to_model = 6
+data_input = pd.read_csv(f"{dir_path}/data/input_KLR5-b-Da-10298um.csv")
 mineral_name = "quartz"
-time_add = [3600*5,110073600]
+time_add = [3600*5,96508800]
 temp_add = [40,21.111111111]
-sample_name = "KM95-28-Dc"
+sample_name = "KLR5-Db"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
+max_domains_to_model = 10
 
 omit_value_indices =  []
 
-misfit_stat_list = ["chisq","l1_moles","l2_moles","l1_frac","l2_frac","l1_moles","l2_moles","l1_frac","l2_frac","percent_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["chisq","l1_moles","l2_moles","l1_frac","l2_frac","percent_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
-def organize_x(x,ndim):
+def organize_x(x,ndim, chop_fracs = True):
         ndom = int(((ndim)/2))
         print(f"ndom is {ndom}")
         if len(x)%2 != 0:
+
             moles = x[0]
             x = x[1:]
+        else:
+             moles = np.NaN
         Ea = x[0]
         lnd0aa = x[1:1+ndom]
         fracs = x[1+ndom:]
@@ -57,22 +60,31 @@ def organize_x(x,ndim):
                 if lnd0aa[j] < lnd0aa[j + 1]:
                     lnd0aa[j], lnd0aa[j + 1] = lnd0aa[j + 1], lnd0aa[j]
                     fracs[j], fracs[j + 1] = fracs[j + 1], fracs[j]
-        if len(x)%2 != 0:
+
+        if "moles" in locals():
+
             output = np.append(moles,Ea)
         else:
              output = Ea
         output = np.append(output,lnd0aa)
-        output = np.append(output,fracs[0:-1])
+        if chop_fracs == True:
+            output = np.append(output,fracs[0:-1])
+        else:
+             output = np.append(output,fracs)
         return output
 
 # Create dataset class for each associate package
-#################################################################
 
-for i in range(2,11):
-    domains_to_model = i
-    print(i)
-    for misfit_stat in misfit_stat_list:
-        print(misfit_stat)
+for misfit_stat in misfit_stat_list:
+
+    
+    save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
+    save_params.fill(np.NaN)
+    for i in range(2,max_domains_to_model+1):
+        
+        domains_to_model = i
+        print(f"{misfit_stat} with {domains_to_model} domains")
+
         dataset = Dataset("diffEV", data_input)
 
 
@@ -92,8 +104,30 @@ for i in range(2,11):
         params, misfit_val = diffEV_multiples(objective,dataset,10,mineral_name,domains_to_model)
         start_time = time.time()
 
+        
+        plot_results(params,dataset,objective,sample_name=sample_name,quiet = True,misfit_stat = misfit_stat)
+        print(organize_x(params,len(params),chop_fracs = False))
+        params = organize_x(params,len(params),chop_fracs = False)
+        
+        if i < max_domains_to_model:
+             num_nans_insert = max_domains_to_model-i
+             nan_insert = np.empty((num_nans_insert))
+             nan_insert.fill(np.NaN)
+             array_w_nans = np.insert(params,[2+i],nan_insert,axis=0)
+             array_w_nans = np.concatenate((array_w_nans,nan_insert),axis = 0)
+        else:
+             array_w_nans = params
+        add_num_doms = np.append(i,array_w_nans)
+        params_to_add = np.append(add_num_doms,misfit_val)
 
-        plot_results(params,dataset,objective,sample_name=sample_name,quiet = True)
-        save_results(domains_to_model,sample_name = sample_name,misfit_stat = misfit_stat,params = params)
-        print(organize_x(params,len(params)))
+        save_params[i-2,0:len(params_to_add)] = params_to_add
+
+
+# I need to add a filler if there is no moles
+        
+        
+
+        save_results(sample_name = sample_name,misfit_stat = misfit_stat,params = save_params)
+
+
 
