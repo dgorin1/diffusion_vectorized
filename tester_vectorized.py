@@ -20,17 +20,17 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_KM95-24-a-Da-1130um.csv")
-mineral_name = "quartz"
-time_add = [3600*5,102124800]
-temp_add = [40,21.111111111]
-sample_name = "KM95-24-a"
+data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles.csv")
+mineral_name = "kspar"
+time_add = [0,0]
+temp_add = [0,0]
+sample_name = "n13ksp"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
 
-omit_value_indices =  []
+omit_value_indices =  [35,36,37,38,39,40,41,42,43]
 
-misfit_stat_list = ["chisq","l1_moles","l2_moles","l1_frac","l2_frac","percent_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["chisq","percent_frac","l1_moles","l2_moles","l1_frac","l2_frac",] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
