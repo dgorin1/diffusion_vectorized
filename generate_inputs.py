@@ -2,7 +2,7 @@ import pandas as pd
 from calculate_experimental_results import D0calc_MonteCarloErrors
 import os
 
-def generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile):
+def generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile,geometry:str = "spherical"):
 
 
     expData = pd.read_csv(nameOfInputCSVFile,header=None)
@@ -15,7 +15,7 @@ def generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile):
     expData.columns = ["TC", "thr","M", "delM"]
 
     # Calculate Daa from experimental results
-    expResults = D0calc_MonteCarloErrors(expData)
+    expResults = D0calc_MonteCarloErrors(expData,geometry)
 
     # Combine the diffusion parameters with the experimental setup (T, thr, M, delM)
     # to get a final dataframe that will be passed into the optimizer
@@ -30,6 +30,8 @@ def generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile):
 #generate some results
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-nameOfInputCSVFile =  f"{dir_path}/data/KM95-24-a-Da-1130um.csv"
-nameOfExperimentalResultsFile = f"{dir_path}/data/input_KM95-24-a-Da-1130um.csv"
-generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile)
+
+nameOfInputCSVFile =  f"{dir_path}/data/n13ksp_moles.csv"
+nameOfExperimentalResultsFile = f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv"
+geometry = "plane sheet"
+generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile,geometry)

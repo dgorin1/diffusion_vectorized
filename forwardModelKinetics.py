@@ -5,7 +5,7 @@ import torch
 import math as math
 from jax import numpy as jnp
 
-def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC): 
+def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "spherical"): 
 
 
     # Check the number of dimensions being passed in to see how many vectors we're dealing with. Code handles 1 vs >1 differently
@@ -49,7 +49,6 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC):
         if ndom > 1:
             tsec = torch.tile(torch.reshape(tsec,(-1,1)),(1,Ea.shape[1])) #This is a complicated-looking way of getting tsec into a numdom x numstep matrix for multiplication
             cumtsec = torch.tile(torch.reshape(torch.cumsum(tsec[:,1],dim=0),(-1,1)),(1,Ea.shape[1])) #Same as above, but for cumtsec        
-
             # Convert TC to TK and put in correct shape for quick computation                                                 
             TK = torch.tile(torch.reshape((TC + 273.15),(-1,1)),(1,Ea.shape[1])) #This is a complicated-looking way of turning TC from a 1-d array to a 2d array and making two column copies of it
 
@@ -73,29 +72,35 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC):
         DtaaForSum[0,:] = Daa[0,:]*tsec[0,:]
         DtaaForSum[1:,:] = Daa[1:,:]*(cumtsec[1:,:]-cumtsec[0:-1,:])
 
-        # # Make the correction for P_D vs D_only
-        for i in range(len(DtaaForSum[0,:])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
-            if DtaaForSum[0,i] <= 1.347419e-17:
-                DtaaForSum[0,i] *= 0
-            elif DtaaForSum[0,i] >= 4.698221e-06:
-                pass
-            else:
-                DtaaForSum[0,i] *= lookup_table(DtaaForSum[0,i])
+        if geometry == "spherical":
+            # # Make the correction for P_D vs D_only
+            for i in range(len(DtaaForSum[0,:])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
+                if DtaaForSum[0,i] <= 1.347419e-17:
+                    DtaaForSum[0,i] *= 0
+                elif DtaaForSum[0,i] >= 4.698221e-06:
+                    pass
+                else:
+                    DtaaForSum[0,i] *= lookup_table(DtaaForSum[0,i])
 
-        # Calculate Dtaa in cumulative form.
-        Dtaa = torch.cumsum(DtaaForSum, axis = 0)
-
-
-        # Calculate f at each step
-        Bt = Dtaa*torch.pi**2
-        f = (6/(math.pi**(3/2)))*torch.sqrt((math.pi**2)*Dtaa)
-        f[Bt>0.0091] = (6/(torch.pi**(3/2)))*torch.sqrt((torch.pi**2)*Dtaa[Bt>0.0091])-(3/(torch.pi**2))* \
-                ((torch.pi**2)*Dtaa[Bt>0.0091])
-        f[Bt >1.8] = 1 - (6/(torch.pi**2))*torch.exp(-(torch.pi**2)*Dtaa[Bt > 1.8])
+            # Calculate Dtaa in cumulative form.
+            Dtaa = torch.cumsum(DtaaForSum, axis = 0)
 
 
+            # Calculate f at each step
+            Bt = Dtaa*torch.pi**2
+            f = (6/(math.pi**(3/2)))*torch.sqrt((math.pi**2)*Dtaa)
+            f[Bt>0.0091] = (6/(torch.pi**(3/2)))*torch.sqrt((torch.pi**2)*Dtaa[Bt>0.0091])-(3/(torch.pi**2))* \
+                    ((torch.pi**2)*Dtaa[Bt>0.0091])
+            f[Bt >1.8] = 1 - (6/(torch.pi**2))*torch.exp(-(torch.pi**2)*Dtaa[Bt > 1.8])
+            
 
-        # Multiply each gas realease by the percent gas located in each domain (prescribed by input)
+
+            # Multiply each gas realease by the percent gas located in each domain (prescribed by input)
+        elif geometry == "plane sheet":
+            # Need to derive a correction for the plane sheet... for now I just won't do an irradiation correction
+            Dtaa = torch.cumsum(DtaaForSum, axis = 0)
+            f = (2/np.sqrt(math.pi))*np.sqrt((Dtaa))
+            f[f > 0.6] = 1-(8/(math.pi**2))*np.exp(-math.pi**2*Dtaa[f > 0.6]/4)
 
         f_MDD = f*fracs
 
@@ -139,7 +144,6 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC):
 
     else:
         lnD0aa = kinetics[0:ndom].unsqueeze(0).expand(len(TC), ndom, -1)
-
         fracstemp = kinetics[ndom:]
         fracs = torch.cat((fracstemp, 1 - torch.sum(fracstemp, axis=0, keepdim=True))).unsqueeze(0).expand(len(TC), -1, -1)
         Ea = Ea.unsqueeze(0).expand(len(TC),ndom,-1)
@@ -200,28 +204,34 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC):
         else:
             DtaaForSum[0,:] = Daa[0,:]*tsec[0,:]
             DtaaForSum[1:,:,:] = Daa[1:,:]*(cumtsec[1:,:]-cumtsec[0:-1,:])
+        if geometry == "spherical":
+            # Make the correction for P_D vs D_only
+            for j in range(len(DtaaForSum[0,0,:])    ):
+                for i in range(len(DtaaForSum[0,:,0])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
+                    if DtaaForSum[0,i,j] <= 1.347419e-17:
+                        DtaaForSum[0,i,j] *= 0
+                    elif DtaaForSum[0,i,j] >= 4.698221e-06:
+                        pass
+                    else:
+                        DtaaForSum[0,i,j] *= lookup_table(DtaaForSum[0,i,j])
 
-        # Make the correction for P_D vs D_only
-        for j in range(len(DtaaForSum[0,0,:])    ):
-            for i in range(len(DtaaForSum[0,:,0])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
-                if DtaaForSum[0,i,j] <= 1.347419e-17:
-                    DtaaForSum[0,i,j] *= 0
-                elif DtaaForSum[0,i,j] >= 4.698221e-06:
-                    pass
-                else:
-                    DtaaForSum[0,i,j] *= lookup_table(DtaaForSum[0,i,j])
-
-        # Calculate Dtaa in cumulative form.
-        Dtaa = torch.cumsum(DtaaForSum, axis = 0)
+            # Calculate Dtaa in cumulative form.
+            Dtaa = torch.cumsum(DtaaForSum, axis = 0)
 
 
-        # Calculate f at each step
-        Bt = Dtaa*torch.pi**2
+            # Calculate f at each step
+            Bt = Dtaa*torch.pi**2
 
-        f = (6/(math.pi**(3/2)))*torch.sqrt((math.pi**2)*Dtaa)
-        f[Bt>0.0091] = (6/(torch.pi**(3/2)))*torch.sqrt((torch.pi**2)*Dtaa[Bt>0.0091])-(3/(torch.pi**2))* ((torch.pi**2)*Dtaa[Bt>0.0091])
-        f[Bt >1.8] = 1 - (6/(torch.pi**2))*torch.exp(-(torch.pi**2)*Dtaa[Bt > 1.8])
+            f = (6/(math.pi**(3/2)))*torch.sqrt((math.pi**2)*Dtaa)
+            f[Bt>0.0091] = (6/(torch.pi**(3/2)))*torch.sqrt((torch.pi**2)*Dtaa[Bt>0.0091])-(3/(torch.pi**2))* ((torch.pi**2)*Dtaa[Bt>0.0091])
+            f[Bt >1.8] = 1 - (6/(torch.pi**2))*torch.exp(-(torch.pi**2)*Dtaa[Bt > 1.8])
 
+        elif geometry == "plane sheet":
+            # Need to derive a correction for the plane sheet... for now I just won't do an irradiation correction
+            Dtaa = torch.cumsum(DtaaForSum, axis = 0)
+            
+            f = (2/np.sqrt(math.pi))*np.sqrt((Dtaa))
+            f[f > 0.6] = 1-(8/(math.pi**2))*np.exp(-math.pi**2*Dtaa[f > 0.6]/4)
 
 
         # Multiply each gas realease by the percent gas located in each domain (prescribed by input)

@@ -11,7 +11,7 @@ from jax import numpy as jnp
 
 
 class DiffusionObjective():
-    def __init__(self, method:str,data:Dataset, time_add: jnp.array, temp_add: jnp.array,pickle_path="../lookup_table.pkl",omitValueIndices = [], stat: str = "chisq"):
+    def __init__(self, method:str,data:Dataset, time_add: jnp.array, temp_add: jnp.array,pickle_path="../lookup_table.pkl",omitValueIndices = [], stat: str = "chisq", geometry:str = "spherical"):
         self.method = method
         if self.method == "ipopt":
             self.dataset = data
@@ -51,6 +51,7 @@ class DiffusionObjective():
             self.omitValueIndices = torch.isin(torch.arange(len(self.dataset)), torch.tensor(omitValueIndices)).to(torch.int)
             self.plateau = torch.sum(((torch.tensor(self.dataset.M)-torch.zeros(len(self.dataset.M)))**2)/(data.uncert**2))
             self.Fi = torch.tensor(data.Fi)
+            self.geometry = geometry
 
     
     
@@ -123,8 +124,8 @@ class DiffusionObjective():
         elif self.method == "diffEV":
             # Forward model the results so that we can calculate the misfit.
 
-            Fi_MDD,punishmentFlag = forwardModelKineticsDiffEV(X,self.lookup_table,self.tsec,self._TC)
-            punishmentFlag = punishmentFlag *10 + 1
+            Fi_MDD,punishmentFlag = forwardModelKineticsDiffEV(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
+            #punishmentFlag = punishmentFlag *10 + 1
 
             exp_moles = torch.tensor(data.M)
             if len(X.shape) > 1:
@@ -192,7 +193,7 @@ class DiffusionObjective():
                     elif self.stat.lower() == "percent_frac":
 
                         misfit = torch.sum(multiplier*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi,axis=0)
-                return misfit*punishmentFlag
+                return misfit#*punishmentFlag
                 
 
             trueFracMDD = Fi_MDD[1:]-Fi_MDD[0:-1]
@@ -219,4 +220,4 @@ class DiffusionObjective():
             elif self.stat.lower() == "percent_frac":
                 misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi)
 
-            return misfit*punishmentFlag
+            return misfit#*punishmentFlag

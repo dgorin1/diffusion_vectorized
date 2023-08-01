@@ -32,6 +32,7 @@ max_domains_to_model = 10
 geometry  = "plane_sheet" # options are "plane_sheet", or "spherical"
 omit_value_indices =  [35,36,37,38,39,40,41,42,43]
 
+
 misfit_stat_list = ["percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac",] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
@@ -97,7 +98,8 @@ for misfit_stat in misfit_stat_list:
             temp_add = torch.tensor(temp_add), 
             pickle_path = f"{dir_path}/data/lookup_table.pkl",
             omitValueIndices= omit_value_indices,
-            stat = misfit_stat
+            stat = misfit_stat,
+            geometry = "plane sheet"
         )
 
         # Read in the nonlinear constraint

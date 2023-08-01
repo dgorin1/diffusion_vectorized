@@ -4,7 +4,7 @@ import pandas as pd
 import math as math
 
 
-def D0calc_MonteCarloErrors(expdata):
+def D0calc_MonteCarloErrors(expdata,geometry:str = "spherical"):
     # Function for calculating D0 and D/a^2 from experimental data. Input should be a
     # Pandas DataFrame with columns "TC", "thr",
     # M, and, and delM, which correspond to heating temperature (deg C), 
@@ -35,7 +35,7 @@ def D0calc_MonteCarloErrors(expdata):
     # initialize diffusivity vectors fore each Fechtig and Kalbitzer equation
     DR2_a = np.zeros([nstep])
     DR2_b = np.zeros([nstep])
-    DR2_c = np.zeros([nstep])
+
 
     # Create the a list of times for each heating step
     diffti = cumtsec[1:]-cumtsec[0:-1]
@@ -44,35 +44,54 @@ def D0calc_MonteCarloErrors(expdata):
     diffFi = Fi[1:]-Fi[0:-1]
 
 
-    # use equations 5a through c from Fechtig and Kalbitzer for spherical geometry
-    # Fechtig and Kalbitzer Equation 5a, for cumulative gas fractions up to 10%
-    # special case when i = 1; need to insert 0 for previous amount released
 
-    DR2_a[0] = ( (Fi[0]**2 - 0.**2 )*math.pi/(36*(cumtsec[0])))
+    #If the geometry is spherical...
+    if geometry == "spherical":
+        #If geometry is spherical, then a third DR2 vector is needed.
+        DR2_c = np.zeros([nstep])
+        # use equations 5a through c from Fechtig and Kalbitzer for spherical geometry
+        # Fechtig and Kalbitzer Equation 5a, for cumulative gas fractions up to 10%
+        # special case when i = 1; need to insert 0 for previous amount released
+
+        DR2_a[0] = ( (Fi[0]**2 - 0.**2 )*math.pi/(36*(cumtsec[0])))
+
+        # Equation 5a for all other steps
+
+        DR2_a[1:] = ((Fi[1:])**2 - (Fi[0:-1])**2 )*math.pi/(36*(diffti))
+
+        # Fechtig and Kalbitzer Equation 5b, for cumulative gas fractions between 10 and 90%
+
+        DR2_b[0] = (1/((math.pi**2)*tsec[0]))*((2*math.pi)-((math.pi*math.pi/3)*Fi[0])\
+                                            - (2*math.pi)*(np.sqrt(1-(math.pi/3)*Fi[0])))
+        DR2_b[1:] = (1/((math.pi**2)*diffti))*(-(math.pi*math.pi/3)*diffFi \
+                                            - (2*math.pi)*( np.sqrt(1-(math.pi/3)*Fi[1:]) \
+                                                - np.sqrt(1 - (math.pi/3)*Fi[0:-1]) ))
+
+        # Fechtig and Kalbitzer Equation 5c, for cumulative gas fractions greater than 90%
+        DR2_c[1:] = (1/(math.pi*math.pi*diffti))*(np.log((1-Fi[0:-1])/(1-Fi[1:])))
+
+        # Decide which equation to use based on the cumulative gas fractions from each step
+        use_a = (Fi<= 0.1) & (Fi> 0.00000001)
+        use_b = (Fi > 0.1) & (Fi<= 0.9)
+        use_c = (Fi > 0.9) & (Fi<= 1.0)
+
+        # Compute the final values
+        DR2 = use_a*DR2_a + np.nan_to_num(use_b*DR2_b) + use_c*DR2_c
+
+    elif geometry == "plane sheet":
+
+        DR2_a = np.zeros([nstep])
+        DR2_b = np.zeros([nstep])
 
 
-    # Equation 5a for all other steps
+        #Fechtig and Kalbitzer Equation 5a
+        DR2_a[0] = ((((Fi[0]**2) - 0**2))*math.pi)/(4*tsec[0])
+        DR2_a[1:] = ((((Fi[1:]**2)-(Fi[0:-1])**2))*math.pi)/(4*tsec[1:])
+        DR2_b[1:] = (4/((math.pi**2)*tsec[1:]))*np.log((1-Fi[0:-1])/(1-Fi[1:]))
+        usea = (Fi > 0) & (Fi < 0.6)
+        useb = (Fi >= 0.6) & (Fi <= 1)
 
-    DR2_a[1:] = ((Fi[1:])**2 - (Fi[0:-1])**2 )*math.pi/(36*(diffti))
-
-    # Fechtig and Kalbitzer Equation 5b, for cumulative gas fractions between 10 and 90%
-
-    DR2_b[0] = (1/((math.pi**2)*tsec[0]))*((2*math.pi)-((math.pi*math.pi/3)*Fi[0])\
-                                        - (2*math.pi)*(np.sqrt(1-(math.pi/3)*Fi[0])))
-    DR2_b[1:] = (1/((math.pi**2)*diffti))*(-(math.pi*math.pi/3)*diffFi \
-                                        - (2*math.pi)*( np.sqrt(1-(math.pi/3)*Fi[1:]) \
-                                            - np.sqrt(1 - (math.pi/3)*Fi[0:-1]) ))
-
-    # Fechtig and Kalbitzer Equation 5c, for cumulative gas fractions greater than 90%
-    DR2_c[1:] = (1/(math.pi*math.pi*diffti))*(np.log((1-Fi[0:-1])/(1-Fi[1:])))
-
-    # Decide which equation to use based on the cumulative gas fractions from each step
-    use_a = (Fi<= 0.1) & (Fi> 0.00000001)
-    use_b = (Fi > 0.1) & (Fi<= 0.9)
-    use_c = (Fi > 0.9) & (Fi<= 1.0)
-
-    # Compute the final values
-    DR2 = use_a*DR2_a + np.nan_to_num(use_b*DR2_b) + use_c*DR2_c
+        DR2 = usea*DR2_a + useb*DR2_b
 
     # Compute uncertainties in diffusivity using a Monte Carlo simulation
     # Generates simulated step degassing datasets, such that each step of the 
@@ -110,7 +129,6 @@ def D0calc_MonteCarloErrors(expdata):
     #Initialize vectors
     MCDR2_a = np.zeros([nstep,n_sim])
     MCDR2_b = np.zeros([nstep,n_sim])
-    MCDR2_c = np.zeros([nstep,n_sim])
     MCdiffFi = np.zeros([nstep,n_sim])
 
 
@@ -121,31 +139,49 @@ def D0calc_MonteCarloErrors(expdata):
             MCdiffFi[0,n] = MCFi[0,n]
     for m in range(0,nstep):
         delMCFi[m] = np.std(MCdiffFi[m,:])
-    for n in range(n_sim): #For each first step of an experiment, insert 0 for previous amount released
-        MCDR2_a[0,n] = ((MCFi[m,n])**2 - (MCFi[m-1,n])**2 )*math.pi/(36*(diffti[m-1]))
-        
-    for m in range(1,nstep): #Calculate fechtig and kalbitzer equations for each fraction
-        for n in range(n_sim):
-            MCDR2_a[m,n] = ( (MCFi[m,n])**2 - (MCFi[m-1,n])**2 )*math.pi/(36*(diffti[m-1]));
-            MCDR2_b[m,n] = (1/((math.pi**2)*diffti[m-1]))*( -(math.pi*math.pi/3)* MCdiffFi[m,n] \
-                            - (2*math.pi)*( np.sqrt(1-(math.pi/3)*MCFi[m,n]) \
-                            -np.sqrt(1 - (math.pi/3)*MCFi[m-1,n]) ))
-            MCDR2_c[m,n] = (1/(math.pi*math.pi*diffti[m-1]))*(np.log((1-MCFi[m-1,n])/(1-MCFi[m,n])));
-    MCdiffFiFinal = np.zeros([nstep])
-    for m in range(0,nstep):
-        MCdiffFiFinal[m] = np.mean(MCdiffFi[m,:])
+    
+    
+    if geometry == "spherical":
+        MCDR2_c = np.zeros([nstep,n_sim])
+        for n in range(n_sim): #For each first step of an experiment, insert 0 for previous amount released
+            MCDR2_a[0,n] = ((MCFi[m,n])**2 - (MCFi[m-1,n])**2 )*math.pi/(36*(diffti[m-1]))
+        for m in range(1,nstep): #Calculate fechtig and kalbitzer equations for each fraction
+            for n in range(n_sim):
+                MCDR2_a[m,n] = ( (MCFi[m,n])**2 - (MCFi[m-1,n])**2 )*math.pi/(36*(diffti[m-1]));
+                MCDR2_b[m,n] = (1/((math.pi**2)*diffti[m-1]))*( -(math.pi*math.pi/3)* MCdiffFi[m,n] \
+                                - (2*math.pi)*( np.sqrt(1-(math.pi/3)*MCFi[m,n]) \
+                                -np.sqrt(1 - (math.pi/3)*MCFi[m-1,n]) ))
+                MCDR2_c[m,n] = (1/(math.pi*math.pi*diffti[m-1]))*(np.log((1-MCFi[m-1,n])/(1-MCFi[m,n])));
+        MCdiffFiFinal = np.zeros([nstep])
+        for m in range(0,nstep):
+            MCdiffFiFinal[m] = np.mean(MCdiffFi[m,:])
 
-    use_a_MC = (MCFi<= 0.1) & (MCFi> 0.00000001)
-    use_b_MC = (MCFi > 0.1) & (MCFi<= 0.9)
-    use_c_MC = (MCFi > 0.9) & (MCFi<= 1.0) 
+        use_a_MC = (MCFi<= 0.1) & (MCFi> 0.00000001)
+        use_b_MC = (MCFi > 0.1) & (MCFi<= 0.9)
+        use_c_MC = (MCFi > 0.9) & (MCFi<= 1.0) 
 
 
-    MCDR2 = use_a_MC*MCDR2_a + np.nan_to_num(use_b_MC*MCDR2_b) + use_c_MC*MCDR2_c
+        MCDR2 = use_a_MC*MCDR2_a + np.nan_to_num(use_b_MC*MCDR2_b) + use_c_MC*MCDR2_c
 
-    MCDR2_uncert = np.zeros([nstep,1])
-    for i in range(nstep):
-        MCDR2_uncert[i,0] = np.std(MCDR2[i,:]) 
+        MCDR2_uncert = np.zeros([nstep,1])
+        for i in range(nstep):
+            MCDR2_uncert[i,0] = np.std(MCDR2[i,:])
 
+    elif geometry == "plane sheet":
+        for i in range(n_sim):
+            MCDR2_a[0,i] = ((MCFi[1,i])**2 - 0**2 )*math.pi/(4*(tsec[0]))
+        for i in range(1,nstep):
+            for j in range(n_sim):
+                MCDR2_a[i,j] = ((MCFi[i,j])**2 - (MCFi[i-1,j])**2 )*math.pi/(4*(tsec[i-1]))
+                MCDR2_b[i,j] = (4/((math.pi**2)*diffti[i-1]))*np.log((1-MCFi[i-1,j])/(1-MCFi[i,j]))
+            usea_MC = (MCFi < 0.6) & (MCFi > 0)
+            useb_MC = (MCFi >= 0.6) & (MCFi <= 1)
+            MCDR2 = usea_MC*MCDR2_a + useb_MC * MCDR2_b
+
+
+        MCDR2_uncert = np.zeros([nstep,1])
+        for i in range(nstep):
+            MCDR2_uncert[i,0] = np.std(MCDR2[i,:])
 
     return pd.DataFrame({"Tplot": Tplot,"Fi": MCFimean.ravel(),"Fi uncertainty": \
                             delMCFi.ravel(), "Daa": DR2,"Daa uncertainty": MCDR2_uncert.ravel(), \
