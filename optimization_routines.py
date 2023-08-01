@@ -33,7 +33,7 @@ def diffEV_multiples(objective,dataset, num_iters: int, mineral: str ,ndom):
         misfits.append(result.fun)
         print(f"misfit: {result.fun}")
         print(f"number of iterations: {result.nit}")
-
+        print(result.x)
         params.append(result.x)  
         seed += 1
    

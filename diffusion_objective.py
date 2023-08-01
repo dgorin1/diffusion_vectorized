@@ -76,6 +76,7 @@ class DiffusionObjective():
 
         # JOSH, DO I GET TO ASSUME THAT X IS GOING TO COME IN AS A JAX NP ARRAY?
         # X = jnp.array(X)
+ 
         if len(X) % 2 != 0:
             total_moles = X[0]
             X = X[1:]
@@ -122,7 +123,8 @@ class DiffusionObjective():
         elif self.method == "diffEV":
             # Forward model the results so that we can calculate the misfit.
 
-            Fi_MDD = forwardModelKineticsDiffEV(X,self.lookup_table,self.tsec,self._TC)
+            Fi_MDD,punishmentFlag = forwardModelKineticsDiffEV(X,self.lookup_table,self.tsec,self._TC)
+            punishmentFlag = punishmentFlag *10 + 1
 
             exp_moles = torch.tensor(data.M)
             if len(X.shape) > 1:
@@ -190,7 +192,7 @@ class DiffusionObjective():
                     elif self.stat.lower() == "percent_frac":
 
                         misfit = torch.sum(multiplier*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi,axis=0)
-                return misfit
+                return misfit*punishmentFlag
                 
 
             trueFracMDD = Fi_MDD[1:]-Fi_MDD[0:-1]
@@ -217,5 +219,4 @@ class DiffusionObjective():
             elif self.stat.lower() == "percent_frac":
                 misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi)
 
-            return misfit
-
+            return misfit*punishmentFlag

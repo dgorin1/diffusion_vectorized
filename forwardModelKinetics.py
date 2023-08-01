@@ -7,7 +7,7 @@ from jax import numpy as jnp
 
 def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC): 
 
-    
+
     # Check the number of dimensions being passed in to see how many vectors we're dealing with. Code handles 1 vs >1 differently
     if kinetics.ndim > 1:
         num_vectors = len(kinetics[0,:])
@@ -107,6 +107,7 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC):
         # Return that sumf_MDD == 0
         if (torch.round(sumf_MDD[2],decimals=6) == 1):
 
+
             return torch.zeros(len(sumf_MDD)-2)
             
 
@@ -117,6 +118,10 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC):
 
         newf = newf[2:]
         normalization_factor = torch.max(torch.cumsum(newf,0))
+
+        punishmentFlag = torch.round(sumf_MDD[-1],decimals=3) < 1.0
+        #punishmentFlag = torch.round(newf[-1,:],decimals = 5) < 1
+        
         diffFi= newf/normalization_factor 
 
 
@@ -128,8 +133,8 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC):
 
         # Resum the gas fractions into cumulative space that doesn't include the two added steps
         sumf_MDD = torch.cumsum(diffFi,axis=0)
-
-        return sumf_MDD
+  
+        return sumf_MDD, punishmentFlag 
 
 
     else:
@@ -242,9 +247,12 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC):
         newf = newf[2:]
 
         normalization_factor = torch.max(torch.cumsum(newf,0),axis=0).values
+    
+        punishmentFlag = torch.round(sumf_MDD[-1,:],decimals = 3) < 1
+
         diffFi= newf/normalization_factor 
 
-        has_positive_value = (normalization_factor > 0).any()
+
 
 
         # use equations 5a through c from Fechtig and Kalbitzer for spherical geometry
@@ -262,8 +270,8 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC):
         nan_mask = torch.isnan(sumf_MDD).all(dim=0)
         sumf_MDD[:,nan_mask]= 0.0
 
-
-        return sumf_MDD
+     
+        return sumf_MDD,punishmentFlag
     
 
 

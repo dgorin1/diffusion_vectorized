@@ -24,13 +24,13 @@ data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles.csv")
 mineral_name = "kspar"
 time_add = [0,0]
 temp_add = [0,0]
-sample_name = "n13ksp"
+sample_name = "n13ksp_lowerlimitOnlnd0aa_times10Punishment"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
-
+geometry  = "plane_sheet" # options are "plane_sheet", or "spherical"
 omit_value_indices =  [35,36,37,38,39,40,41,42,43]
 
-misfit_stat_list = ["chisq","percent_frac","l1_moles","l2_moles","l1_frac","l2_frac",] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac",] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
@@ -80,7 +80,7 @@ for misfit_stat in misfit_stat_list:
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(2,max_domains_to_model+1):
+    for i in range(6,max_domains_to_model+1):
         
         domains_to_model = i
         print(f"{misfit_stat} with {domains_to_model} domains")
