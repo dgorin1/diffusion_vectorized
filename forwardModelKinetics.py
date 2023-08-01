@@ -232,7 +232,7 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "s
             
             f = (2/np.sqrt(math.pi))*np.sqrt((Dtaa))
             f[f > 0.6] = 1-(8/(math.pi**2))*np.exp(-math.pi**2*Dtaa[f > 0.6]/4)
-
+            
 
         # Multiply each gas realease by the percent gas located in each domain (prescribed by input)
         f_MDD = f*fracs

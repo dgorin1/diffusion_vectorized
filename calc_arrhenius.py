@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 
-def calc_arrhenius(kinetics,lookup_table,tsec,TC):
+def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry):
 
         # kinetics: (Ea, lnd0aa_x, fracs_x). To make this compatible with other functions, if there are x fracs, input x-1 fractions, and the code will determine the
     # final fraction.
@@ -78,13 +78,19 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC):
     # Calculate Dtaa in cumulative form.
     Dtaa = torch.cumsum(DtaaForSum, axis = 0)
 
-    
+    if geometry == "spherical":
     # Calculate f at each step
-    Bt = Dtaa*torch.pi**2
-    f = (6/(math.pi**(3/2)))*torch.sqrt((math.pi**2)*Dtaa)
-    f[Bt>0.0091] = (6/(torch.pi**(3/2)))*torch.sqrt((torch.pi**2)*Dtaa[Bt>0.0091])-(3/(torch.pi**2))* \
-            ((torch.pi**2)*Dtaa[Bt>0.0091])
-    f[Bt >1.8] = 1 - (6/(torch.pi**2))*torch.exp(-(torch.pi**2)*Dtaa[Bt > 1.8])
+        Bt = Dtaa*torch.pi**2
+        f = (6/(math.pi**(3/2)))*torch.sqrt((math.pi**2)*Dtaa)
+        f[Bt>0.0091] = (6/(torch.pi**(3/2)))*torch.sqrt((torch.pi**2)*Dtaa[Bt>0.0091])-(3/(torch.pi**2))* \
+                ((torch.pi**2)*Dtaa[Bt>0.0091])
+        f[Bt >1.8] = 1 - (6/(torch.pi**2))*torch.exp(-(torch.pi**2)*Dtaa[Bt > 1.8])
+    elif geometry == "plane sheet":
+            Dtaa = torch.cumsum(DtaaForSum, axis = 0)
+            f = (2/np.sqrt(math.pi))*np.sqrt((Dtaa))
+            f[f > 0.6] = 1-(8/(math.pi**2))*np.exp(-math.pi**2*Dtaa[f > 0.6]/4)
+
+            
 
     
 
@@ -109,8 +115,7 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC):
     normalization_factor = torch.max(torch.cumsum(newf,0))
     diffFi= newf/normalization_factor 
 
-     # I THINK WE CAN ACTUALLY DITCH THIS CALCULATION FROM HERE DOWN TO INCREASE PERFORMANCE! LET'S DO LATER, THOUGH).
-    # Calculate the apparent Daa from the MDD using equations of Fechtig and Kalbitzer 
+    
     Daa_MDD_a = torch.zeros(diffFi.shape)
     Daa_MDD_b = torch.zeros(diffFi.shape)
     Daa_MDD_c = torch.zeros(diffFi.shape)
@@ -129,31 +134,44 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC):
 
 
     # Calculate Daa from the MDD model using fechtig and kalbitzer
-
-    Daa_MDD_a[0] = ( (sumf_MDD[0]**2 - 0.**2 )*torch.pi/(36*(diffti[0])))
-
-
-    # Equation 5a for all other steps
-
-    Daa_MDD_a[1:] = ((sumf_MDD[1:])**2 - (sumf_MDD[0:-1])**2 )*math.pi/(36*(diffti[1:]))
-
-    # Fechtig and Kalbitzer Equation 5b, for cumulative gas fractions between 10 and 90%
-    Daa_MDD_b[0] = (1/((torch.pi**2)*tsec[0,0]))*((2*torch.pi)-((math.pi*math.pi/3)*sumf_MDD[0])\
-                                        - (2*math.pi)*(torch.sqrt(1-(math.pi/3)*sumf_MDD[0])))
-    Daa_MDD_b[1:] = (1/((math.pi**2)*diffti[1:]))*(-(math.pi*math.pi/3)*diffFi[1:] \
-                                        - (2*math.pi)*( torch.sqrt(1-(math.pi/3)*sumf_MDD[1:]) \
-                                            - torch.sqrt(1 - (math.pi/3)*sumf_MDD[0:-1]) ))
-
-    # Fechtig and Kalbitzer Equation 5c, for cumulative gas fractions greater than 90%
-    Daa_MDD_c[1:] = (1/(math.pi*math.pi*diffti[1:]))*(torch.log((1-sumf_MDD[0:-1])/(1-sumf_MDD[1:])))
-
-    # Decide which equation to use based on the cumulative gas fractions from each step
-    use_a = (sumf_MDD<= 0.1) & (sumf_MDD> 0.00000001)
-    use_b = (sumf_MDD > 0.1) & (sumf_MDD<= 0.9)
-    use_c = (sumf_MDD > 0.9) & (sumf_MDD<= 1.0)
-    Daa_MDD = use_a*Daa_MDD_a + torch.nan_to_num(use_b*Daa_MDD_b) + use_c*Daa_MDD_c
+    if geometry == "spherical":
+        Daa_MDD_a[0] = ( (sumf_MDD[0]**2 - 0.**2 )*torch.pi/(36*(diffti[0])))
 
 
+        # Equation 5a for all other steps
+
+        Daa_MDD_a[1:] = ((sumf_MDD[1:])**2 - (sumf_MDD[0:-1])**2 )*math.pi/(36*(diffti[1:]))
+
+        # Fechtig and Kalbitzer Equation 5b, for cumulative gas fractions between 10 and 90%
+        Daa_MDD_b[0] = (1/((torch.pi**2)*tsec[0,0]))*((2*torch.pi)-((math.pi*math.pi/3)*sumf_MDD[0])\
+                                            - (2*math.pi)*(torch.sqrt(1-(math.pi/3)*sumf_MDD[0])))
+        Daa_MDD_b[1:] = (1/((math.pi**2)*diffti[1:]))*(-(math.pi*math.pi/3)*diffFi[1:] \
+                                            - (2*math.pi)*( torch.sqrt(1-(math.pi/3)*sumf_MDD[1:]) \
+                                                - torch.sqrt(1 - (math.pi/3)*sumf_MDD[0:-1]) ))
+
+        # Fechtig and Kalbitzer Equation 5c, for cumulative gas fractions greater than 90%
+        Daa_MDD_c[1:] = (1/(math.pi*math.pi*diffti[1:]))*(torch.log((1-sumf_MDD[0:-1])/(1-sumf_MDD[1:])))
+
+        # Decide which equation to use based on the cumulative gas fractions from each step
+        use_a = (sumf_MDD<= 0.1) & (sumf_MDD> 0.00000001)
+        use_b = (sumf_MDD > 0.1) & (sumf_MDD<= 0.9)
+        use_c = (sumf_MDD > 0.9) & (sumf_MDD<= 1.0)
+        Daa_MDD = use_a*Daa_MDD_a + torch.nan_to_num(use_b*Daa_MDD_b) + use_c*Daa_MDD_c
+
+    elif geometry == "plane sheet":
+        DR2_a = np.zeros([nstep])
+        DR2_b = np.zeros([nstep])
+
+
+        #Fechtig and Kalbitzer Equation 5a
+        DR2_a[0] = ((((sumf_MDD[0]**2) - 0**2))*math.pi)/(4*tsec[0])
+        DR2_a[1:] = ((((sumf_MDD[1:]**2)-(sumf_MDD[0:-1])**2))*math.pi)/(4*tsec[1:])
+        DR2_b[1:] = (4/((math.pi**2)*tsec[1:]))*np.log((1-sumf_MDD[0:-1])/(1-sumf_MDD[1:]))
+        usea = (sumf_MDD > 0) & (sumf_MDD < 0.6)
+        useb = (sumf_MDD >= 0.6) & (sumf_MDD <= 1)
+
+        Daa_MDD = usea*DR2_a + useb*DR2_b
+        
     lnDaa_MDD = torch.log(Daa_MDD)
 
     # if torch.sum(torch.isnan(sumf_MDD))>0:

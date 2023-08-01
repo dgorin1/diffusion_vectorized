@@ -20,7 +20,7 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
 mineral_name = "kspar"
 time_add = [0,0]
 temp_add = [0,0]
@@ -80,7 +80,7 @@ for misfit_stat in misfit_stat_list:
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(6,max_domains_to_model+1):
+    for i in range(2,max_domains_to_model+1):
         
         domains_to_model = i
         print(f"{misfit_stat} with {domains_to_model} domains")
@@ -101,7 +101,7 @@ for misfit_stat in misfit_stat_list:
         # Read in the nonlinear constraint
 
 
-        params, misfit_val = diffEV_multiples(objective,dataset,10,mineral_name,domains_to_model)
+        params, misfit_val = diffEV_multiples(objective,dataset,2,mineral_name,domains_to_model)
         start_time = time.time()
 
         

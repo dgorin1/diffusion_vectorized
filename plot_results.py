@@ -39,7 +39,7 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
 
 
 
-    data = calc_arrhenius(params,objective.lookup_table,tsec,TC)
+    data = calc_arrhenius(params,objective.lookup_table,tsec,TC,objective.geometry)
     print(data)
 
     T_plot = 10000/(dataset["TC"]+273.15)
