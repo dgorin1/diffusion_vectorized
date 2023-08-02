@@ -20,7 +20,7 @@ def diffEV_multiples(objective,dataset, num_iters: int, mineral: str ,ndom):
         result = differential_evolution(
         objective, 
         bounds, 
-        disp=True, 
+        disp=False, 
         tol=0.0001, #4 zeros seems like a good number from testing. slow, but useful.
         maxiter = 30000,
         constraints = nlc,
@@ -33,7 +33,6 @@ def diffEV_multiples(objective,dataset, num_iters: int, mineral: str ,ndom):
         misfits.append(result.fun)
         print(f"misfit: {result.fun}")
         print(f"number of iterations: {result.nit}")
-        print(result.x)
         params.append(result.x)  
         seed += 1
    

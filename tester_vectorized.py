@@ -27,7 +27,7 @@ temp_add = [0,0]
 sample_name = "n13ksp_plane_sheet"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
-geometry  = "plane_sheet" # options are "plane_sheet", or "spherical"
+geometry  = "plane sheet" # options are "plane sheet", or "spherical"
 omit_value_indices =  [35,36,37,38,39,40,41,42,43]
 
 misfit_stat_list = ["percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac",] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
@@ -80,7 +80,7 @@ for misfit_stat in misfit_stat_list:
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(2,max_domains_to_model+1):
+    for i in range(6,max_domains_to_model+1):
         
         domains_to_model = i
         print(f"{misfit_stat} with {domains_to_model} domains")
@@ -95,20 +95,20 @@ for misfit_stat in misfit_stat_list:
             temp_add = torch.tensor(temp_add), 
             pickle_path = f"{dir_path}/data/lookup_table.pkl",
             omitValueIndices= omit_value_indices,
-            stat = misfit_stat
+            stat = misfit_stat,
+            geometry = geometry
         )
 
         # Read in the nonlinear constraint
 
 
-        params, misfit_val = diffEV_multiples(objective,dataset,2,mineral_name,domains_to_model)
+        params, misfit_val = diffEV_multiples(objective,dataset,10,mineral_name,domains_to_model)
         start_time = time.time()
 
         
         plot_results(params,dataset,objective,sample_name=sample_name,quiet = True,misfit_stat = misfit_stat)
         print(organize_x(params,len(params),chop_fracs = False))
         params = organize_x(params,len(params),chop_fracs = False)
-        
         if i < max_domains_to_model:
              num_nans_insert = max_domains_to_model-i
              nan_insert = np.empty((num_nans_insert))

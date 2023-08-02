@@ -193,6 +193,7 @@ class DiffusionObjective():
                     elif self.stat.lower() == "percent_frac":
 
                         misfit = torch.sum(multiplier*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi,axis=0)
+
                 return misfit#*punishmentFlag
                 
 

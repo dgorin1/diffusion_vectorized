@@ -11,8 +11,7 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
     # dataset is the dataset class with your data
     # objective is the objective you used
     # reference_law is an array with values [Ea, lnd0aa]
-    print("plotting params:")
-    print(params)
+
     R = 0.008314
     params = torch.tensor(params)
     if len(params) %2 !=0:
@@ -40,7 +39,7 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
 
 
     data = calc_arrhenius(params,objective.lookup_table,tsec,TC,objective.geometry)
-    print(data)
+
 
     T_plot = 10000/(dataset["TC"]+273.15)
     if len(reference_law) == 0:
@@ -58,7 +57,7 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
 
     #plt.subplot(n_plots,1,1)
 
-    frac_weights = (fracs-torch.min(fracs)/(torch.max(fracs)-torch.min(fracs)))*1.5+1.3
+    frac_weights = (fracs-torch.min(fracs)/(torch.max(fracs)-torch.min(fracs)))*3.5+1.7
     if torch.any(torch.lt(frac_weights,0)):
 
         frac_weights = torch.abs(frac_weights.flip(0))
