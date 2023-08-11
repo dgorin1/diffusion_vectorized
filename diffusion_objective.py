@@ -125,7 +125,7 @@ class DiffusionObjective():
             # Forward model the results so that we can calculate the misfit.
 
             Fi_MDD,punishmentFlag = forwardModelKineticsDiffEV(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
-            #punishmentFlag = punishmentFlag *10 + 1
+            punishmentFlag = punishmentFlag *100 + 1
 
             exp_moles = torch.tensor(data.M)
             if len(X.shape) > 1:
@@ -194,7 +194,7 @@ class DiffusionObjective():
 
                         misfit = torch.sum(multiplier*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi,axis=0)
 
-                return misfit#*punishmentFlag
+                return misfit*punishmentFlag
                 
 
             trueFracMDD = Fi_MDD[1:]-Fi_MDD[0:-1]
@@ -221,4 +221,4 @@ class DiffusionObjective():
             elif self.stat.lower() == "percent_frac":
                 misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi)
 
-            return misfit#*punishmentFlag
+            return misfit*punishmentFlag
