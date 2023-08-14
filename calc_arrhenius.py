@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 
-def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry):
+def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
 
         # kinetics: (Ea, lnd0aa_x, fracs_x). To make this compatible with other functions, if there are x fracs, input x-1 fractions, and the code will determine the
     # final fraction.
@@ -106,15 +106,19 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry):
     if (torch.round(sumf_MDD[2],decimals=6) == 1):
         return torch.zeros(len(sumf_MDD))
         
+    if extra_steps == True:
+        # Remove the two steps we added, recalculate the total sum, and renormalize.
+        newf = torch.zeros(sumf_MDD.shape)
+        newf[0] = sumf_MDD[0]
+        newf[1:] = sumf_MDD[1:]-sumf_MDD[0:-1]
+        newf = newf[2:]
+        normalization_factor = torch.max(torch.cumsum(newf,0))
+        diffFi= newf/normalization_factor 
 
-    # Remove the two steps we added, recalculate the total sum, and renormalize.
-    newf = torch.zeros(sumf_MDD.shape)
-    newf[0] = sumf_MDD[0]
-    newf[1:] = sumf_MDD[1:]-sumf_MDD[0:-1]
-    newf = newf[2:]
-    normalization_factor = torch.max(torch.cumsum(newf,0))
-    diffFi= newf/normalization_factor 
-
+    else:
+        diffFi = torch.zeros(sumf_MDD.shape)
+        diffFi[0] = sumf_MDD[0]
+        diffFi[1:] = sumf_MDD[1:]-sumf_MDD[0:-1]
     
     Daa_MDD_a = torch.zeros(diffFi.shape)
     Daa_MDD_b = torch.zeros(diffFi.shape)
@@ -127,7 +131,11 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry):
     # Calculate duration for each individual step removing the added steps
     diffti = cumtsec[1:,1]-cumtsec[0:-1,1]
     diffti = torch.concat((torch.unsqueeze(cumtsec[0,0],dim=-1),diffti),dim=-1)
-    diffti = diffti[2:]
+    if extra_steps == True:
+        diffti = diffti[2:]
+    else:
+
+        diffti = tsec[:,1].unsqueeze(0).ravel()
 
     # Resum the gas fractions into cumulative space that doesn't include the two added steps
     sumf_MDD = torch.cumsum(diffFi,axis=0)
@@ -159,13 +167,17 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry):
         Daa_MDD = use_a*Daa_MDD_a + torch.nan_to_num(use_b*Daa_MDD_b) + use_c*Daa_MDD_c
 
     elif geometry == "plane sheet":
+
         DR2_a = torch.zeros(diffFi.shape)
         DR2_b = torch.zeros(diffFi.shape)
+
+     
 
 
         #Fechtig and Kalbitzer Equation 5a
 
         DR2_a[0] = ((((sumf_MDD[0]**2) - 0**2))*math.pi)/(4*diffti[0])
+
         DR2_a[1:] = ((((sumf_MDD[1:]**2)-(sumf_MDD[0:-1])**2))*math.pi)/(4*diffti[1:])
         DR2_b[1:] = (4/((math.pi**2)*diffti[1:]))*np.log((1-sumf_MDD[0:-1])/(1-sumf_MDD[1:]))
         usea = (sumf_MDD > 0) & (sumf_MDD < 0.6)

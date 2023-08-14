@@ -176,7 +176,7 @@ class DiffusionObjective():
                     elif self.stat.lower() == "percent_frac":
                         misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi)
                     elif self.stat.lower() == "lnd0aa":
-                        lnd0aa_MDD = calc_lnd0aa(Fi_MDD,self.tsec,self.geometry)
+                        lnd0aa_MDD = calc_lnd0aa(Fi_MDD,self.tsec,self.geometry,self.extra_steps)
                         lnd0aa_MDD[lnd0aa_MDD==-np.inf] = 0
                         lnd0aa_MDD[lnd0aa_MDD==np.inf] = 0
                         lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0
@@ -215,7 +215,7 @@ class DiffusionObjective():
                         misfit = torch.sum(multiplier*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi,axis=0)
                     elif self.stat.lower() == "lnd0aa":
 
-                        lnd0aa_MDD = calc_lnd0aa(Fi_MDD,self.tsec,self.geometry)
+                        lnd0aa_MDD = calc_lnd0aa(Fi_MDD,self.tsec,self.geometry,self.extra_steps)
                         lnd0aa_MDD[lnd0aa_MDD==-np.inf] = 0
                         lnd0aa_MDD[lnd0aa_MDD==np.inf] = 0
                         lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0
@@ -250,7 +250,7 @@ class DiffusionObjective():
             elif self.stat.lower() == "percent_frac":
                 misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi)
             elif self.stat.lower() == "lnd0aa":
-                lnd0aa_MDD = calc_lnd0aa(Fi_MDD,self.tsec,self.geometry)
+                lnd0aa_MDD = calc_lnd0aa(Fi_MDD,self.tsec,self.geometry,self.extra_steps)
                 lnd0aa_MDD[lnd0aa_MDD==-np.inf] = 0
                 lnd0aa_MDD[lnd0aa_MDD==np.inf] = 0
                 lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0

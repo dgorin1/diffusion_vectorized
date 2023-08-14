@@ -503,10 +503,12 @@ def forward_model_kinetics_no_extra_heating(kinetics, lookup_table,tsec,TC, geom
     
 
 
-def calc_lnd0aa(sumf_MDD,diffti,geometry):
+def calc_lnd0aa(sumf_MDD,diffti,geometry,extra_steps):
 
     if len(sumf_MDD.size())>1: #if there are multiple entries
         diffti = diffti.unsqueeze(1).repeat(1,sumf_MDD.size()[1])
+    if extra_steps == True:
+        diffti = diffti[2:]
 
     if geometry == "spherical":
         Daa_MDD_a = torch.zeros(sumf_MDD.shape)
@@ -541,6 +543,7 @@ def calc_lnd0aa(sumf_MDD,diffti,geometry):
         Daa_MDD = use_a*Daa_MDD_a + torch.nan_to_num(use_b*Daa_MDD_b) + use_c*Daa_MDD_c
 
     elif geometry == "plane sheet":
+        
         DR2_a = torch.zeros(sumf_MDD.shape)
         DR2_b = torch.zeros(sumf_MDD.shape)
 
