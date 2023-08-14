@@ -16,6 +16,7 @@ def diffEV_multiples(objective,dataset, num_iters: int, mineral: str ,ndom):
     seed = random.randint(0,2^28)
     mole_bound = tuple((sum(dataset.M)- 1*torch.sqrt(sum(torch.tensor(dataset.delM) **2)), sum(dataset.M) + 1*torch.sqrt(sum(torch.tensor(dataset.delM) **2))))
     bounds = generate_bounds(ndom, mole_bound, mineral, objective.stat)
+
     for i in range(num_iters):
         result = differential_evolution(
         objective, 
