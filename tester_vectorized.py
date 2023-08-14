@@ -14,7 +14,7 @@ from generate_bounds import generate_bounds
 import pickle
 import random
 import time
-from plot_results import plot_results
+from plot_results import plot_resultså
 from optimization_routines import diffEV_multiples
 from save_results import save_results
 
@@ -24,13 +24,13 @@ data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
 mineral_name = "kspar"
 time_add = [0,0]
 temp_add = [0,0]
-sample_name = "n13ksp_plane_sheet"
+sample_name = "n13ksp_plane_sheet_punishment_100x"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
-geometry  = "spherical" # options are "plane sheet", or "spherical"
-omit_value_indices =  [33,34,35,36,37,38,39,40,41,42,43]
+geometry  = "plane sheet" # options are "plane sheet", or "spherical"
+omit_value_indices =  [35,36,37,38,39,40,41,42,43]
 
-misfit_stat_list = ["lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac",] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac",] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
@@ -80,7 +80,7 @@ for misfit_stat in misfit_stat_list:
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(6,max_domains_to_model+1):
+    for i in range(2,max_domains_to_model+1):
         
         domains_to_model = i
         print(f"{misfit_stat} with {domains_to_model} domains")

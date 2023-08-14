@@ -134,8 +134,6 @@ class DiffusionObjective():
         elif self.method == "diffEV":
             # Forward model the results so that we can calculate the misfit.
 
-            Fi_MDD,punishmentFlag = forwardModelKineticsDiffEV(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
-            punishmentFlag = punishmentFlag *100 + 1
             if self.extra_steps == True:
                 Fi_MDD,punishmentFlag = forwardModelKineticsDiffEV(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
             else:
@@ -258,4 +256,4 @@ class DiffusionObjective():
                 lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0
                 misfit = torch.sum((1-self.omitValueIndices)*((lnd0aa_MDD-self.lnd0aa)**2))
 
-            return misfit*punishmentFlag
+            return misfit#*punishmentFlag
