@@ -22,8 +22,8 @@ from save_results import save_results
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
 mineral_name = "kspar"
-time_add = []
-temp_add = []
+time_add = [0,0]
+temp_add = [0,0]
 sample_name = "n13ksp_plane_sheet"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
@@ -80,7 +80,7 @@ for misfit_stat in misfit_stat_list:
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(3,max_domains_to_model+1):
+    for i in range(6,max_domains_to_model+1):
         
         domains_to_model = i
         print(f"{misfit_stat} with {domains_to_model} domains")
