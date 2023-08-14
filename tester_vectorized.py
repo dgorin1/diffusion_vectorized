@@ -22,9 +22,9 @@ from save_results import save_results
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
 mineral_name = "kspar"
-time_add = [0,0]
-temp_add = [0,0]
-sample_name = "n13ksp_plane_sheet_punishment_with_normalization_correct_indices"
+time_add = []
+temp_add = []
+sample_name = "n13ksp_plane_sheet_punishment_NO_normalization_correct_indices"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
 geometry  = "plane sheet" # options are "plane sheet", or "spherical"
