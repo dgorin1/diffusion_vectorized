@@ -139,7 +139,7 @@ class DiffusionObjective():
             else:
                 Fi_MDD = forward_model_kinetics_no_extra_heating(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
                 punishmentFlag = 1
-            #punishmentFlag = punishmentFlag *10 + 1
+            punishmentFlag = punishmentFlag *10 + 1
 
             exp_moles = torch.tensor(data.M)
             if len(X.shape) > 1:
@@ -223,7 +223,7 @@ class DiffusionObjective():
 
 
   
-                return misfit#*punishmentFlag
+                return misfit*punishmentFlag
                 
 
             trueFracMDD = Fi_MDD[1:]-Fi_MDD[0:-1]
@@ -256,4 +256,4 @@ class DiffusionObjective():
                 lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0
                 misfit = torch.sum((1-self.omitValueIndices)*((lnd0aa_MDD-self.lnd0aa)**2))
 
-            return misfit#*punishmentFlag
+            return misfit*punishmentFlag
