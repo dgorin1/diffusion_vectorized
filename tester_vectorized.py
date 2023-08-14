@@ -22,15 +22,15 @@ from save_results import save_results
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
 mineral_name = "kspar"
-time_add = [0,0]
-temp_add = [0,0]
-sample_name = "n13ksp_plane_sheet_punishment_100x"
+time_add = []
+temp_add = []
+sample_name = "n13ksp_plane_sheet_no_punishment"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
 geometry  = "plane sheet" # options are "plane sheet", or "spherical"
-omit_value_indices =  [35,36,37,38,39,40,41,42,43]
+omit_value_indices =  [33,34,35,36,37,38,39,40,41,42,43]
 
-misfit_stat_list = ["percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac",] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
