@@ -109,8 +109,8 @@ class DiffusionObjective():
             if self.extra_steps == True:
                 Fi_MDD,punishmentFlag = forwardModelKineticsDiffEV(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
             else:
-                Fi_MDD = forward_model_kinetics_no_extra_heating(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
-                punishmentFlag = 1
+                Fi_MDD, punishmentFlag = forward_model_kinetics_no_extra_heating(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
+
             punishmentFlag = punishmentFlag *10 + 1
 
             exp_moles = torch.tensor(data.M)

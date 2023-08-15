@@ -117,10 +117,15 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
     else:
         diffFi = f_MDD
         
-    
-    Daa_MDD_a = torch.zeros(diffFi.shape)
-    Daa_MDD_b = torch.zeros(diffFi.shape)
-    Daa_MDD_c = torch.zeros(diffFi.shape)
+    if extra_steps == True:
+        Daa_MDD_a = torch.zeros(diffFi.shape)
+        Daa_MDD_b = torch.zeros(diffFi.shape)
+        Daa_MDD_c = torch.zeros(diffFi.shape)
+    else:
+        Daa_MDD_a = torch.zeros(diffFi.shape[0])
+        Daa_MDD_b = torch.zeros(diffFi.shape[0])
+        Daa_MDD_c = torch.zeros(diffFi.shape[0])
+
 
     # use equations 5a through c from Fechtig and Kalbitzer for spherical geometry
     # Fechtig and Kalbitzer Equation 5a, for cumulative gas fractions up to 10%
@@ -164,17 +169,17 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
         Daa_MDD = use_a*Daa_MDD_a + torch.nan_to_num(use_b*Daa_MDD_b) + use_c*Daa_MDD_c
 
     elif geometry == "plane sheet":
-
-        DR2_a = torch.zeros(diffFi.shape)
-        DR2_b = torch.zeros(diffFi.shape)
+        if extra_steps == True:
+            DR2_a = torch.zeros(diffFi.shape)
+            DR2_b = torch.zeros(diffFi.shape)
+        else:
+            DR2_a = torch.zeros(diffFi.shape[0])
+            DR2_b = torch.zeros(diffFi.shape[0])
 
      
-
-
         #Fechtig and Kalbitzer Equation 5a
 
         DR2_a[0] = ((((sumf_MDD[0]**2) - 0**2))*math.pi)/(4*diffti[0])
-
         DR2_a[1:] = ((((sumf_MDD[1:]**2)-(sumf_MDD[0:-1])**2))*math.pi)/(4*diffti[1:])
         DR2_b[1:] = (4/((math.pi**2)*diffti[1:]))*np.log((1-sumf_MDD[0:-1])/(1-sumf_MDD[1:]))
         usea = (sumf_MDD > 0) & (sumf_MDD < 0.6)
