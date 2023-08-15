@@ -390,6 +390,7 @@ def forward_model_kinetics_no_extra_heating(kinetics, lookup_table,tsec,TC, geom
         # Renormalize everything by first calculating the fractional releases at each step, summing back up, 
         # and then dividing by the max released in each fraction. This simulates how we would have measured and calculated this in the lab.
         sumf_MDD = torch.sum(f_MDD,axis=1) 
+
         return sumf_MDD  
 
 
@@ -498,7 +499,7 @@ def forward_model_kinetics_no_extra_heating(kinetics, lookup_table,tsec,TC, geom
         nan_mask = torch.isnan(sumf_MDD).all(dim=0)
         sumf_MDD[:,nan_mask]= 0.0
 
-     
+
         return sumf_MDD
     
 

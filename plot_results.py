@@ -39,7 +39,7 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
 
 
     data = calc_arrhenius(params,objective.lookup_table,tsec,TC,objective.geometry,objective.extra_steps)
-
+    
 
     T_plot = 10000/(dataset["TC"]+273.15)
     if len(reference_law) == 0:
@@ -119,8 +119,8 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
         axes[0,1].set_box_aspect(1)     
     plt.tight_layout
     file_name = get_plot_name(ndom,"fit_plot",sample_name,moves_type = moves_type,misfit_stat = misfit_stat)
-
+    breakpoint()
     plt.savefig(file_name)
-
+    
     if quiet == False:
         plt.show()

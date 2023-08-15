@@ -80,7 +80,7 @@ for misfit_stat in misfit_stat_list:
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(8,max_domains_to_model+1):
+    for i in range(4,max_domains_to_model+1):
         
         domains_to_model = i
         print(f"{misfit_stat} with {domains_to_model} domains")
@@ -102,12 +102,13 @@ for misfit_stat in misfit_stat_list:
         # Read in the nonlinear constraint
 
 
-        params, misfit_val = diffEV_multiples(objective,dataset,10,mineral_name,domains_to_model)
+        params, misfit_val = diffEV_multiples(objective,dataset,1,mineral_name,domains_to_model)
         start_time = time.time()
 
-        
+
         plot_results(params,dataset,objective,sample_name=sample_name,quiet = True,misfit_stat = misfit_stat)
         print(organize_x(params,len(params),chop_fracs = False))
+        breakpoint()
         params = organize_x(params,len(params),chop_fracs = False)
         if i < max_domains_to_model:
              num_nans_insert = max_domains_to_model-i
@@ -115,6 +116,7 @@ for misfit_stat in misfit_stat_list:
              nan_insert.fill(np.NaN)
              array_w_nans = np.insert(params,[2+i],nan_insert,axis=0)
              array_w_nans = np.concatenate((array_w_nans,nan_insert),axis = 0)
+             breakpoint()
         else:
              array_w_nans = params
         add_num_doms = np.append(i,array_w_nans)
