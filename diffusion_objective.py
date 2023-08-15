@@ -100,38 +100,10 @@ class DiffusionObjective():
         # Grab the other parameters from the input
         temp = X[1:]
 
-        if self.method == "ipopt":
-            Fi_MDD = forwardModelKineticsIpopt(X,self.lookup_table,self.tsec,self._TC) # Gas fraction released for each heating step in model experiment
-            Fi_exp = data.Fi_exp #Gas fraction released for each heating step in experiment
         
-            # Calculate the Fraction released for each heating step in the real experiment
-            TrueFracFi = Fi_exp[1:] - Fi_exp[:-1]
-            TrueFracFi = jnp.concatenate((jnp.expand_dims(Fi_exp[0], axis=-1), TrueFracFi), axis=-1)
 
 
-            # Calculate the fraction released for each heating step in the modeled experiment
-            trueFracMDD = Fi_MDD[1:] - Fi_MDD[:-1]
-            trueFracMDD = jnp.concatenate((jnp.expand_dims(Fi_MDD[0], axis=-1), trueFracMDD), axis=-1)
-            
-                    # Sometimes the forward model predicts kinetics such that ALL the gas would have leaked out during the irradiation and lab storage.
-            # In this case, we end up with trueFracMDD == 0, so we should return a high misfit because we know this is not true, else we wouldn't
-            # have measured any He in the lab. 
-
-            exp_moles = data._M
-            moles_MDD = trueFracMDD * total_moles
-            if jnp.sum(trueFracMDD) == 0:
-                moles_MDD = jnp.zeros([moles_MDD.shape[0]])
-
-            if jnp.isnan(moles_MDD).all():
-                moles_MDD = jnp.zeros([moles_MDD.shape[0]])
-
-            misfit = ((exp_moles-moles_MDD)**2)/(data.uncert**2)
-
-            return jnp.sum(misfit, where = self.omitValueIndices)
-
-
-
-        elif self.method == "diffEV":
+        if self.method == "diffEV":
             # Forward model the results so that we can calculate the misfit.
 
             if self.extra_steps == True:
@@ -145,6 +117,7 @@ class DiffusionObjective():
             if len(X.shape) > 1:
 
                 if X.shape[1] == 0: #If we get passed an empty vector, which seems to happen when all generated samples do not meet constraints
+
                     return([])
 
                         # Calculate the fraction released for each heating step in the modeled experiment
@@ -177,6 +150,7 @@ class DiffusionObjective():
                         misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi)
                     elif self.stat.lower() == "lnd0aa":
                         lnd0aa_MDD = calc_lnd0aa(Fi_MDD,self.tsec,self.geometry,self.extra_steps)
+
                         lnd0aa_MDD[lnd0aa_MDD==-np.inf] = 0
                         lnd0aa_MDD[lnd0aa_MDD==np.inf] = 0
                         lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0
@@ -220,7 +194,7 @@ class DiffusionObjective():
                         lnd0aa_MDD[lnd0aa_MDD==np.inf] = 0
                         lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0
                         misfit = torch.sum(multiplier*((lnd0aa_MDD-self.lnd0aa.unsqueeze(1))**2),axis=0)
-
+                        
 
   
                 return misfit*punishmentFlag
@@ -255,5 +229,5 @@ class DiffusionObjective():
                 lnd0aa_MDD[lnd0aa_MDD==np.inf] = 0
                 lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0
                 misfit = torch.sum((1-self.omitValueIndices)*((lnd0aa_MDD-self.lnd0aa)**2))
-
+                
             return misfit*punishmentFlag

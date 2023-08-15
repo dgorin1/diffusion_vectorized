@@ -20,21 +20,22 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_3DomSynthDataNoisyM3_plane_sheet.csv")
 mineral_name = "kspar"
-time_add = [0,0]
-temp_add = [0,0]
-sample_name = "n13ksp_plane_sheet_YES_punishment_YES_normalization"
+time_add = [300*60,2003040*60] #Add extra time in seconds
+temp_add = [40,21.1111111]
+sample_name = "code_testing_8-15"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
-max_domains_to_model = 10
-geometry  = "plane sheet" # options are "plane sheet", or "spherical"
-omit_value_indices =  [33,34,35,36,37,38,39,40,41,42,43]
+max_domains_to_model = 3
+geometry  = "plane sheet" #"plane sheet" # options are "plane sheet", or "spherical"
+omit_value_indices =  [] #[33,34,35,36,37,38,39,40,41,42,43]
 
 misfit_stat_list = ["lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
 def organize_x(x,ndim, chop_fracs = True):
+
         ndom = int(((ndim)/2))
         print(f"ndom is {ndom}")
         if len(x)%2 != 0:
@@ -51,10 +52,10 @@ def organize_x(x,ndim, chop_fracs = True):
         n = len(fracs)
         # Traverse through all array elements
         for i in range(n):
-            
+
             # Last i elements are already in place
             for j in range(0, n - i - 1):
-                
+
                 # Traverse the array from 0 to n-i-1
                 # Swap if the element found is greater than the next element
                 if lnd0aa[j] < lnd0aa[j + 1]:
@@ -80,7 +81,7 @@ for misfit_stat in misfit_stat_list:
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(4,max_domains_to_model+1):
+    for i in range(3,max_domains_to_model+1):
         
         domains_to_model = i
         print(f"{misfit_stat} with {domains_to_model} domains")
@@ -102,21 +103,23 @@ for misfit_stat in misfit_stat_list:
         # Read in the nonlinear constraint
 
 
-        params, misfit_val = diffEV_multiples(objective,dataset,1,mineral_name,domains_to_model)
+        params, misfit_val = diffEV_multiples(objective,dataset,2,mineral_name,domains_to_model)
+
         start_time = time.time()
 
-        print(organize_x(params,len(params),chop_fracs = False))
         plot_results(params,dataset,objective,sample_name=sample_name,quiet = True,misfit_stat = misfit_stat)
-        print(organize_x(params,len(params),chop_fracs = False))
-        breakpoint()
+ 
+        
         params = organize_x(params,len(params),chop_fracs = False)
+        print(params)
+
         if i < max_domains_to_model:
              num_nans_insert = max_domains_to_model-i
              nan_insert = np.empty((num_nans_insert))
              nan_insert.fill(np.NaN)
              array_w_nans = np.insert(params,[2+i],nan_insert,axis=0)
              array_w_nans = np.concatenate((array_w_nans,nan_insert),axis = 0)
-             breakpoint()
+
         else:
              array_w_nans = params
         add_num_doms = np.append(i,array_w_nans)

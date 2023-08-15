@@ -11,7 +11,7 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
     # dataset is the dataset class with your data
     # objective is the objective you used
     # reference_law is an array with values [Ea, lnd0aa]
-    breakpoint()
+
     R = 0.008314
     params = torch.tensor(params)
     if len(params) %2 !=0:
@@ -32,14 +32,17 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
     # Reconstruct the time-added and temp-added inputs
     time = torch.tensor(dataset.thr*3600)
     TC = torch.tensor(dataset.TC)
-    tsec = torch.cat([torch.tensor(np.array(objective.time_add)),time])
-    TC = torch.cat([torch.tensor(np.array(objective.temp_add)),TC])
+    if objective.extra_steps == True:
 
+        tsec = torch.cat([torch.tensor(np.array(objective.time_add)),time])
+        TC = torch.cat([torch.tensor(np.array(objective.temp_add)),TC])
+    else:
+        tsec = objective.tsec
 
 
 
     data = calc_arrhenius(params,objective.lookup_table,tsec,TC,objective.geometry,objective.extra_steps)
-    
+
 
     T_plot = 10000/(dataset["TC"]+273.15)
     if len(reference_law) == 0:
@@ -119,7 +122,7 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
         axes[0,1].set_box_aspect(1)     
     plt.tight_layout
     file_name = get_plot_name(ndom,"fit_plot",sample_name,moves_type = moves_type,misfit_stat = misfit_stat)
-    breakpoint()
+
     plt.savefig(file_name)
     
     if quiet == False:

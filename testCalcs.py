@@ -17,23 +17,20 @@ import time
 from plot_results import plot_results
 from optimization_routines import diffEV_multiples
 from save_results import save_results
-from forwardModelKinetics import forwardModelKineticsDiffEV
-
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_3DomSynthDataNoisyM3_plane_sheet.csv")
 mineral_name = "kspar"
-time_add = []
-temp_add = []
-sample_name = "n13ksp_lowerlimitOnlnd0aa"
+time_add = [300*60,2003040*60] #Add extra time in seconds
+temp_add = [40,21.1111111] # Add temps in C
+sample_name = "code_testing_8-15"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
-max_domains_to_model = 10
-geometry  = "plane_sheet" # options are "plane_sheet", or "spherical"
-omit_value_indices =  [33,34,35,36,37,38,39,40,41,42,43]
+max_domains_to_model = 3
+geometry  = "plane sheet" #"plane sheet" # options are "plane sheet", or "spherical"
+omit_value_indices =  [] #[33,34,35,36,37,38,39,40,41,42,43]
 
-
-misfit_stat_list = ["lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac",] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["l1_frac","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
@@ -106,14 +103,17 @@ for misfit_stat in misfit_stat_list:
 
 
         
-        params = np.array([2.3155810050715200E+02,	3.0006523504698600E+01,	2.6460332358030300E+01,	2.3502088065041600E+01,	2.0933831653999800E+01	,1.8547769479585900E+01,	1.6535012866122400E+01,	1.2093210842318700E+01,	8.3997796272198300E+00,	2.9659338447177100E-01	,1.0550505660897700E-02,	1.1499608346341400E-03	,5.0635822214749900E-01,	6.2788840934097400E-02,	2.2057364050240000E-02,	6.4366669188869300E-02])
+        params = np.array([[90,16,14,5,0.73,0.25],
+                          [90,16,14,5,0.73,0.25]]).T
+        temp = objective.objective(params)
+        breakpoint()
         plot_results(params,dataset,objective,sample_name=sample_name,quiet = True,misfit_stat = misfit_stat)
         #pickle_path = f"{dir_path}/data/lookup_table.pkl"
         #lookup_table = pickle.load(open(pickle_path,'rb'))
         #forwardModelKineticsDiffEV(params, lookup_table,tsec,TC)
 
 
-        objective.objective(params)
+        
         #print(organize_x(params,len(params),chop_fracs = False))
         #params = organize_x(params,len(params),chop_fracs = False)
         

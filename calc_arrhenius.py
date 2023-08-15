@@ -21,7 +21,6 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
     kinetics = torch.tensor(kinetics)
     temp = kinetics[1:]
 
-
     # Copy the parameters into dimensions that mirror those of the experiment schedule to increase calculation speed.
     lnD0aa = torch.tile(temp[0:ndom],(len(TC),1)) # Do this for LnD0aa
     fracstemp = temp[ndom:] # Grab fracs that were input (one will be missing because it is pre-determined by the others)
@@ -86,7 +85,7 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
                 ((torch.pi**2)*Dtaa[Bt>0.0091])
         f[Bt >1.8] = 1 - (6/(torch.pi**2))*torch.exp(-(torch.pi**2)*Dtaa[Bt > 1.8])
     elif geometry == "plane sheet":
-            Dtaa = torch.cumsum(DtaaForSum, axis = 0)
+
             f = (2/np.sqrt(math.pi))*np.sqrt((Dtaa))
             f[f > 0.6] = 1-(8/(math.pi**2))*np.exp(-math.pi**2*Dtaa[f > 0.6]/4)
 
@@ -103,8 +102,8 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
 
     # If the second heating step gets gas release all the way to 100%, then the rest of the calculation is not necessary. 
     # Return that sumf_MDD == 0
-    if (torch.round(sumf_MDD[2],decimals=6) == 1):
-        return torch.zeros(len(sumf_MDD))
+    # if (torch.round(sumf_MDD[2],decimals=6) == 1):
+    #     return torch.zeros(len(sumf_MDD))
         
     if extra_steps == True:
         # Remove the two steps we added, recalculate the total sum, and renormalize.
@@ -114,11 +113,10 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
         newf = newf[2:]
         normalization_factor = torch.max(torch.cumsum(newf,0))
         diffFi= newf/normalization_factor 
-
+        sumf_MDD = torch.cumsum(diffFi,axis=0)
     else:
-        diffFi = torch.zeros(sumf_MDD.shape)
-        diffFi[0] = sumf_MDD[0]
-        diffFi[1:] = sumf_MDD[1:]-sumf_MDD[0:-1]
+        diffFi = f_MDD
+        
     
     Daa_MDD_a = torch.zeros(diffFi.shape)
     Daa_MDD_b = torch.zeros(diffFi.shape)
@@ -134,11 +132,10 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
     if extra_steps == True:
         diffti = diffti[2:]
     else:
-
         diffti = tsec[:,1].unsqueeze(0).ravel()
 
     # Resum the gas fractions into cumulative space that doesn't include the two added steps
-    sumf_MDD = torch.cumsum(diffFi,axis=0)
+
 
 
     # Calculate Daa from the MDD model using fechtig and kalbitzer

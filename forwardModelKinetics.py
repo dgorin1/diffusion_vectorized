@@ -74,13 +74,13 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "s
 
         if geometry == "spherical":
             # # Make the correction for P_D vs D_only
-            for i in range(len(DtaaForSum[0,:])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
-                if DtaaForSum[0,i] <= 1.347419e-17:
-                    DtaaForSum[0,i] *= 0
-                elif DtaaForSum[0,i] >= 4.698221e-06:
-                    pass
-                else:
-                    DtaaForSum[0,i] *= lookup_table(DtaaForSum[0,i])
+            # for i in range(len(DtaaForSum[0,:])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
+            #     if DtaaForSum[0,i] <= 1.347419e-17:
+            #         DtaaForSum[0,i] *= 0
+            #     elif DtaaForSum[0,i] >= 4.698221e-06:
+            #         pass
+            #     else:
+            #         DtaaForSum[0,i] *= lookup_table(DtaaForSum[0,i])
 
             # Calculate Dtaa in cumulative form.
             Dtaa = torch.cumsum(DtaaForSum, axis = 0)
@@ -111,9 +111,9 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "s
         # If the second heating step gets gas release all the way to 100%, then the rest of the calculation is not necessary. 
         # Return that sumf_MDD == 0
         if (torch.round(sumf_MDD[2],decimals=6) == 1):
+            pass
 
-
-            return torch.zeros(len(sumf_MDD)-2)
+            #return torch.zeros(len(sumf_MDD)-2)
             
 
         # Remove the two steps we added, recalculate the total sum, and renormalize.
@@ -228,10 +228,10 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "s
 
         elif geometry == "plane sheet":
             # Need to derive a correction for the plane sheet... for now I just won't do an irradiation correction
+
             Dtaa = torch.cumsum(DtaaForSum, axis = 0)
-            
             f = (2/np.sqrt(math.pi))*np.sqrt((Dtaa))
-            f[f > 0.6] = 1-(8/(math.pi**2))*np.exp(-math.pi**2*Dtaa[f > 0.6]/4)
+            f[f > 0.6] = 1-(8/(math.pi**2))*np.exp(-1*math.pi**2*Dtaa[f > 0.6]/4)
 
 
 
@@ -245,9 +245,10 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "s
         # If the second heating step gets gas release all the way to 100%, then the rest of the calculation is not necessary. 
         # Return that sumf_MDD == 0
         if num_vectors == 1:
-        
+
             if (torch.round(sumf_MDD[2],decimals=6) == 1):
-                return torch.zeros(len(sumf_MDD)-2)
+                pass
+                #return torch.zeros(len(sumf_MDD)-2)
             
 
 
@@ -381,6 +382,7 @@ def forward_model_kinetics_no_extra_heating(kinetics, lookup_table,tsec,TC, geom
             # Multiply each gas realease by the percent gas located in each domain (prescribed by input)
         elif geometry == "plane sheet":
             # Need to derive a correction for the plane sheet... for now I just won't do an irradiation correction
+
             Dtaa = torch.cumsum(DtaaForSum, axis = 0)
             f = (2/np.sqrt(math.pi))*np.sqrt((Dtaa))
             f[f > 0.6] = 1-(8/(math.pi**2))*np.exp(-math.pi**2*Dtaa[f > 0.6]/4)
@@ -390,7 +392,6 @@ def forward_model_kinetics_no_extra_heating(kinetics, lookup_table,tsec,TC, geom
         # Renormalize everything by first calculating the fractional releases at each step, summing back up, 
         # and then dividing by the max released in each fraction. This simulates how we would have measured and calculated this in the lab.
         sumf_MDD = torch.sum(f_MDD,axis=1) 
-
         return sumf_MDD  
 
 
@@ -499,7 +500,7 @@ def forward_model_kinetics_no_extra_heating(kinetics, lookup_table,tsec,TC, geom
         nan_mask = torch.isnan(sumf_MDD).all(dim=0)
         sumf_MDD[:,nan_mask]= 0.0
 
-
+     
         return sumf_MDD
     
 
