@@ -11,7 +11,7 @@ def plot_results(params,dataset,objective, reference_law = [],sample_name:str = 
     # dataset is the dataset class with your data
     # objective is the objective you used
     # reference_law is an array with values [Ea, lnd0aa]
-
+    breakpoint()
     R = 0.008314
     params = torch.tensor(params)
     if len(params) %2 !=0:

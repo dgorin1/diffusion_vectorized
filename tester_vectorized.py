@@ -22,9 +22,9 @@ from save_results import save_results
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
 mineral_name = "kspar"
-time_add = []
-temp_add = []
-sample_name = "n13ksp_plane_sheet_YES_punishment_NO_normalization"
+time_add = [0,0]
+temp_add = [0,0]
+sample_name = "n13ksp_plane_sheet_YES_punishment_YES_normalization"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
 geometry  = "plane sheet" # options are "plane sheet", or "spherical"
@@ -105,7 +105,7 @@ for misfit_stat in misfit_stat_list:
         params, misfit_val = diffEV_multiples(objective,dataset,1,mineral_name,domains_to_model)
         start_time = time.time()
 
-
+        print(organize_x(params,len(params),chop_fracs = False))
         plot_results(params,dataset,objective,sample_name=sample_name,quiet = True,misfit_stat = misfit_stat)
         print(organize_x(params,len(params),chop_fracs = False))
         breakpoint()
