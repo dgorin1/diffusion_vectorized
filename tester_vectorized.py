@@ -22,8 +22,8 @@ from save_results import save_results
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_3DomSynthDataNoisyM3_plane_sheet.csv")
 mineral_name = "kspar"
-time_add = [300*60,2003040*60] #Add extra time in seconds
-temp_add = [40,21.1111111]
+time_add = [] #Add extra time in seconds
+temp_add = []
 sample_name = "code_testing_8-15"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 3
