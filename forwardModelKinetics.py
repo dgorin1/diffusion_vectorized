@@ -111,9 +111,7 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "s
         # If the second heating step gets gas release all the way to 100%, then the rest of the calculation is not necessary. 
         # Return that sumf_MDD == 0
         if (torch.round(sumf_MDD[2],decimals=6) == 1):
-            
-
-            return torch.zeros(len(sumf_MDD)-2)
+            return torch.zeros(len(sumf_MDD)-2),0
             
 
         # Remove the two steps we added, recalculate the total sum, and renormalize.
@@ -248,7 +246,7 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "s
 
             if (torch.round(sumf_MDD[2],decimals=6) == 1):
 
-                return torch.zeros(len(sumf_MDD)-2)
+                return torch.zeros(len(sumf_MDD)-2),0
             
 
 
