@@ -206,14 +206,14 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "s
             DtaaForSum[1:,:,:] = Daa[1:,:]*(cumtsec[1:,:]-cumtsec[0:-1,:])
         if geometry == "spherical":
             # Make the correction for P_D vs D_only
-            for j in range(len(DtaaForSum[0,0,:])    ):
-                for i in range(len(DtaaForSum[0,:,0])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
-                    if DtaaForSum[0,i,j] <= 1.347419e-17:
-                        DtaaForSum[0,i,j] *= 0
-                    elif DtaaForSum[0,i,j] >= 4.698221e-06:
-                        pass
-                    else:
-                        DtaaForSum[0,i,j] *= lookup_table(DtaaForSum[0,i,j])
+            # for j in range(len(DtaaForSum[0,0,:])    ):
+            #     for i in range(len(DtaaForSum[0,:,0])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
+            #         if DtaaForSum[0,i,j] <= 1.347419e-17:
+            #             DtaaForSum[0,i,j] *= 0
+            #         elif DtaaForSum[0,i,j] >= 4.698221e-06:
+            #             pass
+            #         else:
+            #             DtaaForSum[0,i,j] *= lookup_table(DtaaForSum[0,i,j])
 
             # Calculate Dtaa in cumulative form.
             Dtaa = torch.cumsum(DtaaForSum, axis = 0)
@@ -358,13 +358,13 @@ def forward_model_kinetics_no_extra_heating(kinetics, lookup_table,tsec,TC, geom
 
         if geometry == "spherical":
             # # Make the correction for P_D vs D_only
-            for i in range(len(DtaaForSum[0,:])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
-                if DtaaForSum[0,i] <= 1.347419e-17:
-                    DtaaForSum[0,i] *= 0
-                elif DtaaForSum[0,i] >= 4.698221e-06:
-                    pass
-                else:
-                    DtaaForSum[0,i] *= lookup_table(DtaaForSum[0,i])
+            # for i in range(len(DtaaForSum[0,:])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
+            #     if DtaaForSum[0,i] <= 1.347419e-17:
+            #         DtaaForSum[0,i] *= 0
+            #     elif DtaaForSum[0,i] >= 4.698221e-06:
+            #         pass
+            #     else:
+            #         DtaaForSum[0,i] *= lookup_table(DtaaForSum[0,i])
 
             # Calculate Dtaa in cumulative form.
             Dtaa = torch.cumsum(DtaaForSum, axis = 0)
@@ -460,14 +460,14 @@ def forward_model_kinetics_no_extra_heating(kinetics, lookup_table,tsec,TC, geom
             DtaaForSum[1:,:,:] = Daa[1:,:]*(cumtsec[1:,:]-cumtsec[0:-1,:])
         if geometry == "spherical":
             # Make the correction for P_D vs D_only
-            for j in range(len(DtaaForSum[0,0,:])    ):
-                for i in range(len(DtaaForSum[0,:,0])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
-                    if DtaaForSum[0,i,j] <= 1.347419e-17:
-                        DtaaForSum[0,i,j] *= 0
-                    elif DtaaForSum[0,i,j] >= 4.698221e-06:
-                        pass
-                    else:
-                        DtaaForSum[0,i,j] *= lookup_table(DtaaForSum[0,i,j])
+            # for j in range(len(DtaaForSum[0,0,:])    ):
+            #     for i in range(len(DtaaForSum[0,:,0])): #This is a really short loop... range of i is # domains. Maybe we could vectorize to improve performance?
+            #         if DtaaForSum[0,i,j] <= 1.347419e-17:
+            #             DtaaForSum[0,i,j] *= 0
+            #         elif DtaaForSum[0,i,j] >= 4.698221e-06:
+            #             pass
+            #         else:
+            #             DtaaForSum[0,i,j] *= lookup_table(DtaaForSum[0,i,j])
 
             # Calculate Dtaa in cumulative form.
             Dtaa = torch.cumsum(DtaaForSum, axis = 0)

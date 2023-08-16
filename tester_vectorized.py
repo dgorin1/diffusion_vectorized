@@ -20,15 +20,15 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
-mineral_name = "kspar"
+data_input = pd.read_csv(f"{dir_path}/data/input_KM95-28-Dc-1250um.csv")
+mineral_name = "quartz"
 time_add = [] #Add extra time in seconds
 temp_add = []
-sample_name = "n13ksp_FINAL"
+sample_name = "KM95-28-Dc-REDO-nolookuptable"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
-max_domains_to_model = 8
-geometry  = "plane sheet" #"plane sheet" # options are "plane sheet", or "spherical"
-omit_value_indices =  [33,34,35,36,37,38,39,40,41]
+max_domains_to_model = 10
+geometry  = "spherical" #"plane sheet" # options are "plane sheet", or "spherical"
+omit_value_indices =  #[33,34,35,36,37,38,39,40,41]
 
 misfit_stat_list = ["lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
