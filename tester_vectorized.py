@@ -22,13 +22,13 @@ from save_results import save_results
 dir_path = os.path.dirname(os.path.realpath(__file__))
 data_input = pd.read_csv(f"{dir_path}/data/input_KM95-28-Dc-1250um.csv")
 mineral_name = "quartz"
-time_add = [] #Add extra time in seconds
-temp_add = []
+time_add = [300*60,110073600] #Add extra time in seconds
+temp_add = [40,21.11111111]
 sample_name = "KM95-28-Dc-REDO-nolookuptable"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
 geometry  = "spherical" #"plane sheet" # options are "plane sheet", or "spherical"
-omit_value_indices =  #[33,34,35,36,37,38,39,40,41]
+omit_value_indices = [] #[33,34,35,36,37,38,39,40,41]
 
 misfit_stat_list = ["lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
@@ -81,7 +81,7 @@ for misfit_stat in misfit_stat_list:
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(8,max_domains_to_model+1):
+    for i in range(2,max_domains_to_model+1):
         
         domains_to_model = i
         print(f"{misfit_stat} with {domains_to_model} domains")
