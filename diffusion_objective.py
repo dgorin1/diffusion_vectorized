@@ -154,6 +154,7 @@ class DiffusionObjective():
                         lnd0aa_MDD[lnd0aa_MDD==-np.inf] = 0
                         lnd0aa_MDD[lnd0aa_MDD==np.inf] = 0
                         lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0
+                        breakpoint()
                         misfit = torch.sum((1-self.omitValueIndices)*((lnd0aa_MDD-self.lnd0aa)**2))
                     
 
@@ -196,7 +197,7 @@ class DiffusionObjective():
                         misfit = torch.sum(multiplier*((lnd0aa_MDD-self.lnd0aa.unsqueeze(1))**2),axis=0)
                         
 
-
+                breakpoint()
                 return misfit*punishmentFlag
                 
 
@@ -229,5 +230,5 @@ class DiffusionObjective():
                 lnd0aa_MDD[lnd0aa_MDD==np.inf] = 0
                 lnd0aa_MDD[torch.isnan(lnd0aa_MDD)] = 0
                 misfit = torch.sum((1-self.omitValueIndices)*((lnd0aa_MDD-self.lnd0aa)**2))
-                
+            breakpoint()
             return misfit*punishmentFlag

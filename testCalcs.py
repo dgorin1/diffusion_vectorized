@@ -20,17 +20,17 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_3DomSynthDataNoisyM3_plane_sheet.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
 mineral_name = "kspar"
-time_add = [300*60,2003040*60] #Add extra time in seconds
-temp_add = [40,21.1111111] # Add temps in C
-sample_name = "code_testing_8-15"
+time_add = [] #Add extra time in seconds
+temp_add = [] # Add temps in C
+sample_name = "Harrison values"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
-max_domains_to_model = 3
+max_domains_to_model = 8
 geometry  = "plane sheet" #"plane sheet" # options are "plane sheet", or "spherical"
-omit_value_indices =  [] #[33,34,35,36,37,38,39,40,41,42,43]
+omit_value_indices =  [33,34,35,36,37,38,39,40,41,42,43]
 
-misfit_stat_list = ["l1_frac","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["percent_frac","l1_frac","l2_frac","l2_moles","lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
@@ -76,41 +76,43 @@ def organize_x(x,ndim, chop_fracs = True):
 # Create dataset class for each associate package
 
 for misfit_stat in misfit_stat_list:
-
+    domains_to_model = 8
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(2,max_domains_to_model+1):
-        
-        domains_to_model = i
-        print(f"{misfit_stat} with {domains_to_model} domains")
-
-        dataset = Dataset("diffEV", data_input)
-
-
-        objective = DiffusionObjective(
-            "diffEV",
-            dataset, 
-            time_add = torch.tensor(time_add), 
-            temp_add = torch.tensor(temp_add), 
-            pickle_path = f"{dir_path}/data/lookup_table.pkl",
-            omitValueIndices= omit_value_indices,
-            stat = misfit_stat,
-            geometry = "plane sheet"
-        )
-
-        # Read in the nonlinear constraint
-
 
         
-        params = np.array([[90,16,14,5,0.73,0.25],
-                          [90,16,14,5,0.73,0.25]]).T
-        temp = objective.objective(params)
-        breakpoint()
-        plot_results(params,dataset,objective,sample_name=sample_name,quiet = True,misfit_stat = misfit_stat)
-        #pickle_path = f"{dir_path}/data/lookup_table.pkl"
-        #lookup_table = pickle.load(open(pickle_path,'rb'))
-        #forwardModelKineticsDiffEV(params, lookup_table,tsec,TC)
+        
+    print(f"{misfit_stat} with {domains_to_model} domains")
+
+    dataset = Dataset("diffEV", data_input)
+
+
+    objective = DiffusionObjective(
+        "diffEV",
+        dataset, 
+        time_add = torch.tensor(time_add), 
+        temp_add = torch.tensor(temp_add), 
+        pickle_path = f"{dir_path}/data/lookup_table.pkl",
+        omitValueIndices= omit_value_indices,
+        stat = misfit_stat,
+        geometry = "plane sheet"
+    )
+
+    # Read in the nonlinear constraint
+
+
+    
+    params = np.array([195.2191933,	19.44830467,16.17659628,13.93007269,8.893664002,8.676650883,6.212899801,6.17580078,	2.470272004,0.02078564,	0.07973485,	0.06776753,	0.18618525,	0.10420018,	0.22466006,	0.13960004])
+    #params = np.array([0.000000000005210,	267.373350300723000,	32.554251749378100,	28.370979816929700	,25.461449986687800,	22.804036255907300,	20.173786810313400	,15.583851430783000,	13.182894713993100	,10.870667542461900	,0.012120858997346,	0.027280174405612	,0.061987256302431	,0.066114795944613	,0.043563780825043	,0.247719079568467,	0.168491995737490])
+    
+    temp = objective.objective(params)
+    print(temp)
+    breakpoint()
+    plot_results(params,dataset,objective,sample_name=sample_name,quiet = True,misfit_stat = misfit_stat)
+    #pickle_path = f"{dir_path}/data/lookup_table.pkl"
+    #lookup_table = pickle.load(open(pickle_path,'rb'))
+    #forwardModelKineticsDiffEV(params, lookup_table,tsec,TC)
 
 
         
