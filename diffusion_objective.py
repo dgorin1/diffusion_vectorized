@@ -110,7 +110,7 @@ class DiffusionObjective():
                 Fi_MDD,punishmentFlag = forwardModelKineticsDiffEV(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
             else:
                 Fi_MDD, punishmentFlag = forward_model_kinetics_no_extra_heating(X,self.lookup_table,self.tsec,self._TC,geometry = self.geometry)
-
+                
             punishmentFlag = punishmentFlag *10 + 1
 
             exp_moles = torch.tensor(data.M)
@@ -196,7 +196,7 @@ class DiffusionObjective():
                         misfit = torch.sum(multiplier*((lnd0aa_MDD-self.lnd0aa.unsqueeze(1))**2),axis=0)
                         
 
-  
+
                 return misfit*punishmentFlag
                 
 

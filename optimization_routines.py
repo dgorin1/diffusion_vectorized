@@ -23,7 +23,7 @@ def diffEV_multiples(objective,dataset, num_iters: int, mineral: str ,ndom):
         bounds, 
         disp=False, 
         tol=0.0001, # zeros seems like a good number from testing. slow, but useful.
-        maxiter = 2000,#30000,
+        maxiter = 30000,
         constraints = nlc,
         vectorized = True,
         updating = "deferred",

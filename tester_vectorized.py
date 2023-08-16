@@ -24,11 +24,11 @@ data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
 mineral_name = "kspar"
 time_add = [] #Add extra time in seconds
 temp_add = []
-sample_name = "stupidtest-15"
+sample_name = "n13ksp_FINAL"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 8
 geometry  = "plane sheet" #"plane sheet" # options are "plane sheet", or "spherical"
-omit_value_indices =  [] #[33,34,35,36,37,38,39,40,41,42,43]
+omit_value_indices =  [33,34,35,36,37,38,39,40,41]
 
 misfit_stat_list = ["lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
