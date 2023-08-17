@@ -4,7 +4,7 @@ import math
 
 
 def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
-
+    
         # kinetics: (Ea, lnd0aa_x, fracs_x). To make this compatible with other functions, if there are x fracs, input x-1 fractions, and the code will determine the
     # final fraction.
 
@@ -85,7 +85,6 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
                 ((torch.pi**2)*Dtaa[Bt>0.0091])
         f[Bt >1.8] = 1 - (6/(torch.pi**2))*torch.exp(-(torch.pi**2)*Dtaa[Bt > 1.8])
     elif geometry == "plane sheet":
-
             f = (2/np.sqrt(math.pi))*np.sqrt((Dtaa))
             f[f > 0.6] = 1-(8/(math.pi**2))*np.exp(-math.pi**2*Dtaa[f > 0.6]/4)
 
@@ -104,7 +103,7 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
     # Return that sumf_MDD == 0
     # if (torch.round(sumf_MDD[2],decimals=6) == 1):
     #     return torch.zeros(len(sumf_MDD))
-        
+
     if extra_steps == True:
         # Remove the two steps we added, recalculate the total sum, and renormalize.
         newf = torch.zeros(sumf_MDD.shape)
@@ -115,7 +114,9 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
         diffFi= newf/normalization_factor 
         sumf_MDD = torch.cumsum(diffFi,axis=0)
     else:
-        diffFi = f_MDD
+        diffFi = torch.zeros(sumf_MDD.shape)
+        diffFi[0] = sumf_MDD[0]
+        diffFi[1:] = sumf_MDD[1:]-sumf_MDD[0:-1]
         
     if extra_steps == True:
         Daa_MDD_a = torch.zeros(diffFi.shape)
@@ -145,6 +146,7 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
 
     # Calculate Daa from the MDD model using fechtig and kalbitzer
     if geometry == "spherical":
+
         Daa_MDD_a[0] = ( (sumf_MDD[0]**2 - 0.**2 )*torch.pi/(36*(diffti[0])))
 
 
@@ -155,9 +157,7 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
         # Fechtig and Kalbitzer Equation 5b, for cumulative gas fractions between 10 and 90%
         Daa_MDD_b[0] = (1/((torch.pi**2)*tsec[0,0]))*((2*torch.pi)-((math.pi*math.pi/3)*sumf_MDD[0])\
                                             - (2*math.pi)*(torch.sqrt(1-(math.pi/3)*sumf_MDD[0])))
-        Daa_MDD_b[1:] = (1/((math.pi**2)*diffti[1:]))*(-(math.pi*math.pi/3)*diffFi[1:] \
-                                            - (2*math.pi)*( torch.sqrt(1-(math.pi/3)*sumf_MDD[1:]) \
-                                                - torch.sqrt(1 - (math.pi/3)*sumf_MDD[0:-1]) ))
+        Daa_MDD_b[1:] = (1/((math.pi**2)*diffti[1:]))*(-(math.pi*math.pi/3)*diffFi[1:] - (2*math.pi)*( torch.sqrt(1-(math.pi/3)*sumf_MDD[1:])- torch.sqrt(1 - (math.pi/3)*sumf_MDD[0:-1]) ))
 
         # Fechtig and Kalbitzer Equation 5c, for cumulative gas fractions greater than 90%
         Daa_MDD_c[1:] = (1/(math.pi*math.pi*diffti[1:]))*(torch.log((1-sumf_MDD[0:-1])/(1-sumf_MDD[1:])))
@@ -176,7 +176,6 @@ def calc_arrhenius(kinetics,lookup_table,tsec,TC,geometry,extra_steps = True):
             DR2_a = torch.zeros(diffFi.shape[0])
             DR2_b = torch.zeros(diffFi.shape[0])
 
-     
         #Fechtig and Kalbitzer Equation 5a
 
         DR2_a[0] = ((((sumf_MDD[0]**2) - 0**2))*math.pi)/(4*diffti[0])
