@@ -18,6 +18,7 @@ def diffEV_multiples(objective,dataset, num_iters: int, mineral: str ,ndom):
     bounds = generate_bounds(ndom, mole_bound, mineral, objective.stat)
 
     for i in range(num_iters):
+
         result = differential_evolution(
         objective, 
         bounds, 
