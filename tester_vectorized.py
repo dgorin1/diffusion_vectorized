@@ -20,11 +20,11 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_KM95-28-Dc-1250um.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_KM95-20-Db-1288um.csv")
 mineral_name = "quartz"
-time_add = [3600*5, 110073600] #Add extra time in seconds
+time_add = [3600*5, 110937600] #Add extra time in seconds
 temp_add = [40,21.11111111]
-sample_name = "input_KM95-28-Dc-1250um_REDO_LookupTableON"
+sample_name = "KM95-20-Db-1288-REDO-nolookuptable"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
 geometry  = "spherical" #"plane sheet" # options are "plane sheet", or "spherical"
