@@ -30,7 +30,7 @@ max_domains_to_model = 10
 geometry  = "plane sheet" #"plane sheet" # options are "plane sheet", or "spherical"
 omit_value_indices = [] #[33,34,35,36,37,38,39,40,41]
 
-misfit_stat_list = ["l1_frac","percent_frac","chisq","l1_moles","l2_moles","l2_frac"] #ADD BACK PERCENT_FRAC. #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["l1_frac","l1_moles","l2_moles","l2_frac","percent_frac","chisq","lnd0aa"] #ADD BACK PERCENT_FRAC. #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 

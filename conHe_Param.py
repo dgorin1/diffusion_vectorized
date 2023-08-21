@@ -21,7 +21,6 @@ def conHe_Param(X:torch.Tensor): # Input is Ea, lnd0aa_x, Frac_x-1
     lnD0aa_diff = lnD0aa[:-1] - lnD0aa[1:]
     lnD0aa_check = np.sum(np.where(lnD0aa_diff <= 0, lnD0aa_diff, np.array(0.0)),axis=0)
 
-
     return np.array([frac_id,lnD0aa_check])
 
     #constraint 1 must be >0
