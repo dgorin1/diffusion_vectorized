@@ -197,7 +197,6 @@ class DiffusionObjective():
                         misfit = torch.sum(multiplier*((lnd0aa_MDD-self.lnd0aa.unsqueeze(1))**2),axis=0)
                         
 
-
                 return misfit*punishmentFlag
                 
 

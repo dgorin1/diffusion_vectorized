@@ -32,6 +32,7 @@ def D0calc_MonteCarloErrors(expdata,geometry:str = "spherical"):
     Fi = Si/S
 
 
+
     # initialize diffusivity vectors fore each Fechtig and Kalbitzer equation
     DR2_a = np.zeros([nstep])
     DR2_b = np.zeros([nstep])
@@ -182,6 +183,7 @@ def D0calc_MonteCarloErrors(expdata,geometry:str = "spherical"):
         MCDR2_uncert = np.zeros([nstep,1])
         for i in range(nstep):
             MCDR2_uncert[i,0] = np.std(MCDR2[i,:])
+
 
     return pd.DataFrame({"Tplot": Tplot,"Fi": MCFimean.ravel(),"Fi uncertainty": \
                             delMCFi.ravel(), "Daa": DR2,"Daa uncertainty": MCDR2_uncert.ravel(), \
