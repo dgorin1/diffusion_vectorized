@@ -20,14 +20,14 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_LABCO-Plag-Db_plane_sheet.csv")
-mineral_name = "plag"
-time_add = [3600*5, 8*365.25*24*3600] #Add extra time in seconds
+data_input = pd.read_csv(f"{dir_path}/data/input_KLR5-b-Da-10298um.csv")
+mineral_name = "quartz"
+time_add = [3600*5, 96508800] #Add extra time in seconds
 temp_add = [40,21.11111111]
-sample_name = "LABCO-Plag-Db_plane_sheet"
+sample_name = "KLR5-Db_REDO_nolookuptable"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
-geometry  = "plane sheet" #"plane sheet" # options are "plane sheet", or "spherical"
+geometry  = "spherical" #"plane sheet" # options are "plane sheet", or "spherical"
 omit_value_indices = [] #[33,34,35,36,37,38,39,40,41]
 
 misfit_stat_list = ["l1_frac","l1_moles","l2_moles","l2_frac","percent_frac","chisq","lnd0aa"] #ADD BACK PERCENT_FRAC. #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
