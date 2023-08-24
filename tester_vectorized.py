@@ -20,17 +20,17 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_KLR5-b-Da-10298um.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_KM95-6-Db-1100um.csv")
 mineral_name = "quartz"
-time_add = [3600*5, 96508800] #Add extra time in seconds
-temp_add = [40,21.11111111]
-sample_name = "KLR5-Db_REDO_nolookuptable"
-moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
+time_add = [3600*5,114048000] #Add extra time in seconds
+temp_add = [40,21.111111111]
+sample_name = "KM95-6-Db-1100um-nolookuptable"
+moves = "quartz" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 10
 geometry  = "spherical" #"plane sheet" # options are "plane sheet", or "spherical"
-omit_value_indices = [] #[33,34,35,36,37,38,39,40,41]
+omit_value_indices = []#[33,34,35,36,37,38,39,40,41]
 
-misfit_stat_list = ["l1_frac","l1_moles","l2_moles","l2_frac","percent_frac","chisq","lnd0aa"] #ADD BACK PERCENT_FRAC. #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["l1_frac_cum","lnd0aa","l1_frac","l1_moles","l2_moles","l2_frac","percent_frac","chisq"] #ADD BACK PERCENT_FRAC. #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 

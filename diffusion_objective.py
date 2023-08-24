@@ -128,6 +128,8 @@ class DiffusionObjective():
                     if self.stat == "l1_frac" or self.stat == "l2_frac" or self.stat == "percent_frac" or self.stat == "lnd0aa":
                         trueFracFi = self.Fi[1:] - self.Fi[0:-1]
                         trueFracFi = torch.concat((torch.unsqueeze(self.Fi[0],dim=-0),trueFracFi),dim=-1)
+                    elif self.stat.lower() == "l1_frac_cum":
+                        Fi = torch.tile(self.Fi.unsqueeze(1),[1,Fi_MDD.shape[0]])
                     else:
     
                         moles_MDD = trueFracMDD * total_moles
@@ -146,6 +148,8 @@ class DiffusionObjective():
                         misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD)))
                     elif self.stat.lower() == "l2_frac":
                         misfit = torch.sum((1-self.omitValueIndices)*(trueFracFi-trueFracMDD)**2)
+                    elif self.stat.lower() == "l1_frac_cum":
+                        misfit = torch.sum((1-self.omitValueIndices)*torch.abs(Fi-Fi_MDD))
                     elif self.stat.lower() == "percent_frac":
                         misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi)
                     elif self.stat.lower() == "lnd0aa":
@@ -168,6 +172,8 @@ class DiffusionObjective():
                         trueFracFi = self.Fi[1:] - self.Fi[0:-1]
                         trueFracFi = torch.concat((torch.unsqueeze(self.Fi[0],dim=-0),trueFracFi),dim=-1)
                         trueFracFi = torch.tile(trueFracFi.unsqueeze(1),[1,trueFracMDD.shape[1]])
+                    elif self.stat.lower() == "l1_frac_cum":
+                        Fi = torch.tile(self.Fi.unsqueeze(1),[1,Fi_MDD.shape[1]])
 
                     else:
                         moles_MDD = trueFracMDD * total_moles
@@ -183,6 +189,8 @@ class DiffusionObjective():
                         misfit = torch.sum((multiplier*((exp_moles.unsqueeze(1)-moles_MDD)**2)),axis=0)
                     elif self.stat.lower() == "l1_frac":
                         misfit = torch.sum(multiplier*(torch.abs(trueFracFi-trueFracMDD)),axis=0)
+                    elif self.stat.lower() == "l1_frac_cum":
+                        misfit = torch.sum(multiplier*(torch.abs(Fi-Fi_MDD)),axis=0)
                     elif self.stat.lower() == "l2_frac":
                         misfit = torch.sum((multiplier*(trueFracFi-trueFracMDD)**2),axis=0)
                     elif self.stat.lower() == "percent_frac":
@@ -208,6 +216,8 @@ class DiffusionObjective():
             if self.stat == "l1_frac" or self.stat == "l2_frac" or self.stat == "percent_frac" or self.stat == "lnd0aa":
                 trueFracFi = self.Fi[1:] - self.Fi[0:-1]
                 trueFracFi = torch.concat((torch.unsqueeze(self.Fi[0],dim=-0),trueFracFi),dim=-1)
+            elif self.stat.lower() == "l1_frac_cum":
+                Fi = torch.tile(self.Fi.unsqueeze(1),[1,Fi_MDD.shape[0]])
             else:
                 moles_MDD = trueFracMDD * total_moles
 
@@ -223,6 +233,8 @@ class DiffusionObjective():
                 misfit = torch.sum((1-self.omitValueIndices)*torch.abs(trueFracFi-trueFracMDD))
             elif self.stat.lower() == "l2_frac":
                 misfit = torch.sum((1-self.omitValueIndices)*(trueFracFi-trueFracMDD)**2)
+            elif self.stat.lower() == "l1_frac_cum":
+               misfit = torch.sum((1-self.omitValueIndices)*torch.abs((Fi-Fi_MDD)))
             elif self.stat.lower() == "percent_frac":
                 misfit = torch.sum((1-self.omitValueIndices)*(torch.abs(trueFracFi-trueFracMDD))/trueFracFi)
             elif self.stat.lower() == "lnd0aa":
