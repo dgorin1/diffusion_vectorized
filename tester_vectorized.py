@@ -20,13 +20,13 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_04-MG-080-BR-He3.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_EG121ERR_DCe.csv")
 mineral_name = "quartz"
-time_add = [3600*5,1.75*365.25*24*3600] #Add extra time in seconds
-temp_add = [40,21.111111111]
-sample_name = "04-MG-080-BR-He3"
+time_add = [] #Add extra time in seconds
+temp_add = []
+sample_name = "EG121ERR_DCe"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
-max_domains_to_model = 10
+max_domains_to_model = 8
 geometry  = "spherical" #"plane sheet" # options are "plane sheet", or "spherical"
 omit_value_indices = []#[33,34,35,36,37,38,39,40,41]
 
