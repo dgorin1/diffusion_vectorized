@@ -20,17 +20,17 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_EG121ERR_DCe.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_CarBZ.csv")
 mineral_name = "quartz"
-time_add = [] #Add extra time in seconds
-temp_add = []
-sample_name = "EG121ERR_DCe"
+time_add = [5*3600,11145600] #Add extra time in seconds
+temp_add = [40,21.1111111]
+sample_name = "CarBZ"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 8
 geometry  = "spherical" #"plane sheet" # options are "plane sheet", or "spherical"
-omit_value_indices = []#[33,34,35,36,37,38,39,40,41]
+omit_value_indices = []#[0,1,2]#[33,34,35,36,37,38,39,40,41]
 
-misfit_stat_list = ["l1_frac_cum","lnd0aa","l1_frac","l1_moles","l2_moles","l2_frac","percent_frac","chisq"] #ADD BACK PERCENT_FRAC. #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["l1_frac_cum","l1_frac","l1_moles","l2_moles","l2_frac","percent_frac","chisq","lnd0aa"] #ADD BACK PERCENT_FRAC. #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
