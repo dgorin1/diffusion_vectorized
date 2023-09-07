@@ -20,11 +20,11 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_CarBZ.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_04-MG-080-BR-He3.csv")
 mineral_name = "quartz"
-time_add = [5*3600,11145600] #Add extra time in seconds
+time_add = [5*3600,47952000] #Add extra time in seconds
 temp_add = [40,21.1111111]
-sample_name = "CarBZ"
+sample_name = "04-MG-080-BR-He3_doublechecking"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 8
 geometry  = "spherical" #"plane sheet" # options are "plane sheet", or "spherical"
@@ -100,7 +100,7 @@ for misfit_stat in misfit_stat_list:
             geometry = geometry
         )
 
-        # Read in the nonlinear constraint
+        # Read in the nonlinear constra¸¸int
 
 
         params, misfit_val = diffEV_multiples(objective,dataset,10,mineral_name,domains_to_model)
