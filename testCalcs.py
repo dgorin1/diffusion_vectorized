@@ -28,9 +28,9 @@ sample_name = "Harrison values"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 8
 geometry  = "plane sheet" #"plane sheet" # options are "plane sheet", or "spherical"
-omit_value_indices =  [33,34,35,36,37,38,39,40,41,42,43]
+omit_value_indices =  [33,34,35,36,37,38,39,40,41]
 
-misfit_stat_list = ["percent_frac","l1_frac","l2_frac","l2_moles","lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["lnd0aa_chisq","percent_frac","l1_frac","l2_frac","l2_moles","lnd0aa","percent_frac","chisq","l1_moles","l2_moles","l1_frac","l2_frac"] #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
@@ -104,7 +104,7 @@ for misfit_stat in misfit_stat_list:
 
     
     params = np.array([195.2191933,	19.44830467,16.17659628,13.93007269,8.893664002,8.676650883,6.212899801,6.17580078,	2.470272004,0.02078564,	0.07973485,	0.06776753,	0.18618525,	0.10420018,	0.22466006,	0.13960004])
-    #params = np.array([0.000000000005210,	267.373350300723000,	32.554251749378100,	28.370979816929700	,25.461449986687800,	22.804036255907300,	20.173786810313400	,15.583851430783000,	13.182894713993100	,10.870667542461900	,0.012120858997346,	0.027280174405612	,0.061987256302431	,0.066114795944613	,0.043563780825043	,0.247719079568467,	0.168491995737490])
+    params = np.array([2.769231656540140000000E+02,	3.255426523804360000000E+01,	2.894918769200630000000E+01,	2.847322039107190000000E+01,	2.317701206932630000000E+01,	1.856993428839810000000E+01,	9.824647209710330000000E+00,	4.428251015916970000000E+00,	-1.957782699118620000000E+00,	1.735817668305280000000E-06,	4.343657125175210000000E-05,	4.143033436386320000000E-05,	1.347455292409410000000E-05,	4.372318827094050000000E-05,	9.015701086121140000000E-05,	1.258581170382940000000E-01,	8.739079254863640000000E-01])
     
     temp = objective.objective(params)
     print(temp)

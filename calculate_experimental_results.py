@@ -180,9 +180,19 @@ def D0calc_MonteCarloErrors(expdata,geometry:str = "spherical"):
             MCDR2 = usea_MC*MCDR2_a + useb_MC * MCDR2_b
 
 
-        MCDR2_uncert = np.zeros([nstep,1])
-        for i in range(nstep):
-            MCDR2_uncert[i,0] = np.std(MCDR2[i,:])
+    MCDR2_uncert = np.zeros([nstep,1])
+    MCDR24Uncert = MCDR2.copy()
+    #For each row in the MCDR, which corresponds to every monte carlo step of the heating schedule..
+    #Replace the Nan/inf/-inf values with the mean so that we can more easily calculate the standard deviation...
+    #To estimate the uncertainty below. 
+    for i in range(MCDR24Uncert.shape[0]-1):
+        index = (MCDR24Uncert[i,:] != -np.inf) & (MCDR24Uncert[i,:] != np.inf)
+        mean = np.mean(MCDR24Uncert[i,:][index])
+        MCDR24Uncert[i,:][~index] = mean
+
+
+    for i in range(nstep):
+        MCDR2_uncert[i,0] = np.std(MCDR24Uncert[i,:])
 
 
     return pd.DataFrame({"Tplot": Tplot,"Fi": MCFimean.ravel(),"Fi uncertainty": \
