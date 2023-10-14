@@ -10,7 +10,7 @@ def generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile,geometry:s
     #If extra columns get read in, trim them down to just 3
     if expData.shape[1] >=4:
         expData = expData.loc[:,1:4]
-        
+
     # Name the columsn of the iput data
     expData.columns = ["TC", "thr","M", "delM"]
 
@@ -31,7 +31,7 @@ def generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile,geometry:s
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
-nameOfInputCSVFile =  f"{dir_path}/data/UPC-1.csv"
-nameOfExperimentalResultsFile = f"{dir_path}/data/input_UPC-1.csv"
-geometry = "spherical"
+nameOfInputCSVFile =  f"{dir_path}/data/93-ng-39.csv"
+nameOfExperimentalResultsFile = f"{dir_path}/data/input_93-ng-39.csv"
+geometry = "plane sheet"
 generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile,geometry)

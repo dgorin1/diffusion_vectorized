@@ -277,7 +277,7 @@ class DiffusionObjective():
                 if torch.sum(misfit<0) >0:
                     breakpoint()
 
-                return misfit#*punishmentFlag
+                return misfit*punishmentFlag
                 
 
             trueFracMDD = Fi_MDD[1:]-Fi_MDD[0:-1]
@@ -332,4 +332,4 @@ class DiffusionObjective():
                 breakpoint()
             
 
-            return misfit#*punishmentFlag
+            return misfit*punishmentFlag

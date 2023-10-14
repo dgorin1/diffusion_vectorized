@@ -20,17 +20,17 @@ from save_results import save_results
 
 # get this file's directory
 dir_path = os.path.dirname(os.path.realpath(__file__))
-data_input = pd.read_csv(f"{dir_path}/data/input_n13ksp_moles_plane_sheet.csv")
+data_input = pd.read_csv(f"{dir_path}/data/input_8DomSynthDataNoisyM3_plane_sheet.csv")
 mineral_name = "kspar"
 time_add = [] #Add extra time in seconds
 temp_add = []
-sample_name = "N13_alldomains_harrisonEA_NO_Punishment"
+sample_name = "SyntheticArArNoisy_8dom_OmitValues_wPunishment"
 moves = "snooker" # Define moves as "snooker" if you fear multimodality in your dataset. Can lead to poor performance if no multimodality exists
 max_domains_to_model = 8
 geometry  = "plane sheet" #"plane sheet" # options are "plane sheet", or "spherical"
 omit_value_indices = [33,34,35,36,37,38,39,40,41] #[]#[0,1,2]#
 
-misfit_stat_list = ["lnd0aa_chisq"] #,"chisq","percent_frac","l1_frac_cum","l1_frac","l1_moles","l2_moles","l2_frac","lnd0aa", , # #ADD BACK PERCENT_FRAC. #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
+misfit_stat_list = ["lnd0aa_chisq","chisq","percent_frac","l1_frac_cum","l1_frac","l1_moles","l2_moles","l2_frac","lnd0aa"] # #ADD BACK PERCENT_FRAC. #options are chisq, l1_moles, l2_moles, l1_frac, l2_frac, percent_frac
 
 
 
@@ -81,7 +81,7 @@ for misfit_stat in misfit_stat_list:
     
     save_params = np.empty((max_domains_to_model-1,max_domains_to_model*2+4))
     save_params.fill(np.NaN)
-    for i in range(8,max_domains_to_model+1):
+    for i in range(2,max_domains_to_model+1):
         
         domains_to_model = i
         print(f"{misfit_stat} with {domains_to_model} domains")
