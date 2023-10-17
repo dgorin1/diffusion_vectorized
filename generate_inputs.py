@@ -31,7 +31,7 @@ def generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile,geometry:s
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
-nameOfInputCSVFile =  f"{dir_path}/data/93-ng-39.csv"
-nameOfExperimentalResultsFile = f"{dir_path}/data/input_93-ng-39.csv"
-geometry = "plane sheet"
+nameOfInputCSVFile =  f"{dir_path}/data/KM95-15-Dg.csv"
+nameOfExperimentalResultsFile = f"{dir_path}/data/input_KM95-15-Dg.csv"
+geometry = "spherical"
 generate_inputs(nameOfInputCSVFile, nameOfExperimentalResultsFile,geometry)
