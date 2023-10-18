@@ -94,6 +94,31 @@ def D0calc_MonteCarloErrors(expdata,geometry:str = "spherical"):
 
         DR2 = usea*DR2_a + useb*DR2_b
 
+
+        uncert_a = np.zeros(len(DR2))
+        uncert_b = np.zeros(len(DR2))
+        uncert_c = np.zeros(len(DR2))
+        # Equation for if n=1 f_n < 0.6
+
+        uncert_a = math.pi/(2*diffti[0]) *(diffFi[0]/np.sum(np.sum(M)))*np.sqrt(((1-diffFi[0])*delM[0])**2 + diffFi[0]**2 * np.sum(delM[1:]**2))
+        
+        
+        for i in range(1,len(M)):
+            uncert_b[i] =(math.pi/(2*(cumtsec[i]-cumtsec[i-1])*np.sum(M)) * np.sqrt(
+                ((Fi[i]*(1-Fi[i])) - Fi[i-1]*(1-Fi[i-1]))**2 * np.sum(delM[0:i]**2) + 
+                (Fi[i]*(1-Fi[i]) + Fi[i-1]**2)**2 * delM[i]**2 + 
+                (Fi[i-1]**2-Fi[i]**2)**2 * np.sum(delM[i+1:]**2)))
+
+            uncert_c[i] = (4/(math.pi**2*(cumtsec[i]-cumtsec[i-1])*np.sum(M))) * np.sqrt((1+Fi[i-1]/(1-Fi[i-1]))**2 * delM[i]**2 + ((Fi[i-1]/(1-Fi[i-1])) - (Fi[i]/(1-Fi[i])))**2 * np.sum(delM[i+1:]**2))
+
+            
+
+    
+        DR2_uncert = usea*uncert_b+useb*uncert_c
+        DR2_uncert[0] = uncert_a
+    ## Compute uncertainties using the equations of Ginster 2018
+
+
     # Compute uncertainties in diffusivity using a Monte Carlo simulation
     # Generates simulated step degassing datasets, such that each step of the 
     # experiment has a Gaussian distribution centered at M and with 1s.d. of
@@ -194,8 +219,7 @@ def D0calc_MonteCarloErrors(expdata,geometry:str = "spherical"):
     for i in range(nstep):
         MCDR2_uncert[i,0] = np.std(MCDR24Uncert[i,:])
 
-
     return pd.DataFrame({"Tplot": Tplot,"Fi": MCFimean.ravel(),"Fi uncertainty": \
-                            delMCFi.ravel(), "Daa": DR2,"Daa uncertainty": MCDR2_uncert.ravel(), \
-                            "ln(D/a^2)": np.log(DR2),"ln(D/a^2)-del": np.log(DR2-MCDR2_uncert.ravel()), \
-                            "ln(D/a^2)+del": np.log(DR2+MCDR2_uncert.ravel()) })
+                            delMCFi.ravel(), "Daa": DR2,"Daa uncertainty": DR2_uncert.ravel(), \
+                            "ln(D/a^2)": np.log(DR2),"ln(D/a^2)-del": np.log(DR2-DR2_uncert.ravel()), \
+                            "ln(D/a^2)+del": np.log(DR2+DR2_uncert.ravel()) })

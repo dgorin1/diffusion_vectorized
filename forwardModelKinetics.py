@@ -280,7 +280,7 @@ def forwardModelKineticsDiffEV(kinetics, lookup_table,tsec,TC, geometry:str = "s
         nan_mask = torch.isnan(sumf_MDD).all(dim=0)
         sumf_MDD[:,nan_mask]= 0.0
 
-     
+        
         return sumf_MDD,punishmentFlag
     
 
@@ -500,6 +500,7 @@ def forward_model_kinetics_no_extra_heating(kinetics, lookup_table,tsec,TC, geom
         sumf_MDD[:,nan_mask]= 0.0
 
         punishmentFlag = torch.round(sumf_MDD[-1,:],decimals = 3) < 1
+
         return sumf_MDD, punishmentFlag
     
 
@@ -563,7 +564,7 @@ def calc_lnd0aa(sumf_MDD,diffti,geometry,extra_steps):
 
     # if torch.sum(torch.isnan(sumf_MDD))>0:
     #     breakpoint()
-
+    
     return lnd0aa_MDD
 
 
